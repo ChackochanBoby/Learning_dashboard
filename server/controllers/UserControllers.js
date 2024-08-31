@@ -12,11 +12,18 @@ const signUp = async (req, res) => {
     if (userExists) {
       return res.status(400).json({ success: false, message: "user already exists" });
     }
+
+    //hash password
     const saltRounds = 10;
     const hash = await bcrypt.hash(password, saltRounds)
+    
+    //creating and instance of userSchema and saving the document
     const user = new User({name:name,email:email,password:hash})
     await user.save()
-    const token = generateToken(user._id,user.name)
+
+    //generate jwt token
+    const token = await generateToken(user._id, user.name)
+    
     res.cookie("Token", token)
     res.status(201).json({success:true,message:"signup successfull"})
 
@@ -25,6 +32,8 @@ const signUp = async (req, res) => {
     res.status(error.statusCode||500).json({success:false,message:error.message||"internal server error"})
   }
 };
+
+
 
 
 
