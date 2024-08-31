@@ -1,9 +1,8 @@
-const express = require('express')
-const {studentRouter}=require("./studentRoute")
+const express = require("express")
+const { userRouter } = require("./userRoutes")
 
 const router = express.Router()
 
-
-router.use("/students",studentRouter)
+router.use("/user", userRouter)
 
 module.exports={v1Router:router}

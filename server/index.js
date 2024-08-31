@@ -5,7 +5,8 @@ const cors = require("cors");
 const { apiRouter } = require("./routes/index");
 const { connectDB } = require("./config/db");
 
-app.use(cors({ origin: true }));
+app.use(cors({ origin: true,credentials:true }));
+app.use(express.json())
 
 app.use("/api", apiRouter);
 
