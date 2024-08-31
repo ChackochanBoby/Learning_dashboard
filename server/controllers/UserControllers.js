@@ -61,6 +61,17 @@ const userLogin = async (req, res, next) => {
   }
 }
 
+const userLogout = async (req, res) => {
+  try {
+    res.clearCookie("Token")
+    res.status(200).json({success:true,message:"successfully logged outgit "})
+
+  } catch (error) {
+    console.error("ERROR!:" + error)
+    res.status(error.statusCode||500).json({success:false,message:error.message||"internal server error"})
+  }
+}
 
 
-module.exports={ userSignup, userLogin }
+
+module.exports={ userSignup, userLogin, userLogout }

@@ -1,13 +1,13 @@
 const express = require("express")
-const { userSignup, userLogin }=require("../../controllers/UserControllers")
+const { userSignup, userLogin, userLogout }=require("../../controllers/UserControllers")
 const router = express.Router()
 
 //user signup
-router.post("/signup",userSignup)
+router.post( "/signup", userSignup )
 //user login
-router.post("/login",userLogin)
+router.post( "/login", userLogin )
 //user logout
-router.post("/logout")
+router.post( "/logout", userLogout )
 
 //user profile
 router.get("/profile")
