@@ -1,6 +1,6 @@
 const express = require("express")
 const { userSignup, userLogin, userLogout, userProfile }=require("../../controllers/UserControllers")
-const { userAuth } = require("../../middlewares/userAuth")
+const { userAuth } = require("../../middlewares/authMiddllewares")
 const router = express.Router()
 
 //user signup
@@ -11,7 +11,7 @@ router.post( "/login", userLogin )
 router.post( "/logout", userLogout )
 
 //user profile
-router.get("/profile",userAuth,userProfile)
+router.get("/profile",userAuth, userProfile)
 //user update
 router.put("/update")
 //user delete
