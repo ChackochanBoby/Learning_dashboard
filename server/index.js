@@ -4,8 +4,10 @@ const port = 3000;
 const cors = require("cors");
 const { apiRouter } = require("./routes/index");
 const { connectDB } = require("./config/db");
+const cookieParser = require("cookie-parser");
 
-app.use(cors({ origin: true,credentials:true }));
+app.use(cors({ origin: true, credentials: true }));
+app.use(cookieParser())
 app.use(express.json())
 
 app.use("/api", apiRouter);

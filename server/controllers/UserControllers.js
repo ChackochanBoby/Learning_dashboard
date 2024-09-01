@@ -43,7 +43,7 @@ const userLogin = async (req, res, next) => {
     if (!userExists) {
       return res.status(404).json({success:false,message:"user does not exist"})
     }
-    console.log(userExists)
+    
     //compare passwords
     const passwordsMatch=await bcrypt.compare(password, userExists.password)
     if (!passwordsMatch) {
@@ -51,7 +51,7 @@ const userLogin = async (req, res, next) => {
     }
 
     //generate jwt token and set cookies
-    const token = generateToken(userExists._id, userExists.name, userExists.role)
+    const token = await generateToken(userExists._id, userExists.name, userExists.roles)
     res.cookie("Token", token)
     res.status(200).json({success:true,message:"user logged in"})
 
@@ -72,6 +72,17 @@ const userLogout = async (req, res) => {
   }
 }
 
+const userProfile = async (req, res, next) => {
+  try {
 
+    const { id } = req.user
+    const profile = await User.findById(id).exec()
+    res.status(200).json({success:true,message:"fetched user profile",data:profile})
+    
+  } catch (error) {
+    console.error("ERROR!:" + error)
+    return res.status(error.statusCode||500).json({success:false,message:error.message||"internal server error"})
+  }
+}
 
-module.exports={ userSignup, userLogin, userLogout }
+module.exports={ userSignup, userLogin, userLogout, userProfile }
