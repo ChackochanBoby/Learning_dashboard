@@ -85,4 +85,46 @@ const userProfile = async (req, res, next) => {
   }
 }
 
-module.exports={ userSignup, userLogin, userLogout, userProfile }
+const updateUser = (req, res, next) => {
+  const { id } = req.user
+  
+}
+
+const getAllUsers = async (req, res, next) => {
+  try {
+    
+    const allUsers = await User.find({}).exec()
+    const data = allUsers.map((user) => {
+      return {name:user.name,email:user.email,id:user._id,roles:user.roles}
+    })
+    res.status(200).json({ success: true, message: "fetched all usets", data:data })
+    
+  } catch (error) {
+    console.error("ERROR!:" + error)
+    return res.status(error.statusCode||500).json({success:false,message:error.message||"internal server error"})
+  }
+}
+
+const deleteUser = async (req, res, next) => {
+  try {
+    
+    const { userId } = req.params
+    
+    const deletedUser = await User.findByIdAndDelete(userId)
+
+    if (!deletedUser) {
+      return res.status(404).json({success:false,message:"user not found"})
+    }
+    res.status(204).send()
+
+  } catch (error) {
+    res.status(error.statusCode || 500).json({
+      success: false,
+      message: error.message || "internal server error",
+    });
+  }
+}
+
+
+
+module.exports={ userSignup, userLogin, userLogout, userProfile, getAllUsers,deleteUser }

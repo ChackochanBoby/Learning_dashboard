@@ -6,7 +6,6 @@ const courseSchema = new mongoose.Schema({
     category:{type:String},
     instructor: { type: Schema.Types.ObjectId, ref: "User", required: true },
     modules: [{ type: Schema.Types.ObjectId, ref: "Module"}],
-    students: [{ type: Schema.Types.ObjectId, ref: "User" }],
     isPublished:{type:Boolean, default:false}
 })
 

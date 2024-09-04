@@ -1,4 +1,5 @@
-const jwt = require("jsonwebtoken")
+const jwt = require("jsonwebtoken");
+const { User } = require("../models/userModel");
 
 const userAuth = async (req, res, next) => {
   try {
@@ -52,9 +53,65 @@ const adminAuth = async (req, res, next) => {
       return res.status(error.statusCode||500).json({success:false,message:error.message||"internal server error"})
     }
 }
+const learnerAuth = async (req, res, next) => {
+  try {
+      const { role } = req.user  
+      const isLearner = role.includes("learner")
+      if (!isLearner) {
+        return res.status(401).json({success:false,message:"unauthorized access"})
+      }
+      next()
+
+    } catch (error) {
+      console.error("ERROR!:" + error)
+      return res.status(error.statusCode||500).json({success:false,message:error.message||"internal server error"})
+    }
+}
+
+//middleware that checks if the user is either admin or an instructor of that particular course
+const instructorAndAdminAuth = async (req, res, next) => {
+  try {
+    const { courseId } = req.params
+      const { role,id } = req.user  
+      const isAdmin = role.includes("admin")
+    if (!isAdmin) {
+      const user = await User.findById(id)
+      const isInstructor = user.courses_managed.includes(courseId)
+      if (!isInstructor) {
+        return res.status(401).json({ success: false, message: "unauthorized access" })
+      }
+      }
+      next()
+
+    } catch (error) {
+      console.error("ERROR!:" + error)
+      return res.status(error.statusCode||500).json({success:false,message:error.message||"internal server error"})
+    }
+}
+const userAndAdminAuth = async (req, res, next) => {
+  try {
+    const {userId}= req.params
+    const { role, id } = req.user
+    if (userId !== id) {
+      const isAdmin = role.includes("admin")
+      if (!isAdmin) {
+       return res.status(401).json({success:false,message:"unauthorized access"})
+      }
+      }
+      next()
+
+    } catch (error) {
+      console.error("ERROR!:" + error)
+      return res.status(error.statusCode||500).json({success:false,message:error.message||"internal server error"})
+    }
+}
+
 
 module.exports = {
   userAuth,
   instructorAuth,
-  adminAuth
+  adminAuth,
+  learnerAuth,
+  instructorAndAdminAuth,
+  userAndAdminAuth
 };
