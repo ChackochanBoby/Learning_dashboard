@@ -64,7 +64,7 @@ const userLogin = async (req, res, next) => {
 const userLogout = async (req, res) => {
   try {
     res.clearCookie("Token")
-    res.status(200).json({success:true,message:"successfully logged outgit "})
+    res.status(200).json({success:true,message:"successfully logged out "})
 
   } catch (error) {
     console.error("ERROR!:" + error)

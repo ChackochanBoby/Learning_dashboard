@@ -32,7 +32,7 @@ const enroll = async (req, res, next) => {
       course:courseId,learner:id
     })
     await newEnrollment.save()
-    res.status(201).json({success:false,message:"user enrolled"})
+    res.status(201).json({success:true,message:"user enrolled"})
   } catch (error) {
     res.status(error.statusCode || 500).json({
         success: false,
