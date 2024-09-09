@@ -20,6 +20,6 @@ router.delete("/delete/:userId",userAuth,userAndAdminAuth,deleteUser)
 //user list
 router.get("/userlist", userAuth, adminAuth, getAllUsers)
 //check user
-router.get("/checkUser")
+router.get("/checkUser",)
 
 module.exports={userRouter:router}
