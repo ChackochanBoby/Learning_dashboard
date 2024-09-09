@@ -19,10 +19,7 @@ const createModule = async (req, res, next) => {
         res.status(201).json({success:true,message:"created new module successfully"})
 
     } catch (error) {
-        res.status(error.statusCode || 500).json({
-            success: false,
-            message: error.message || "internal server error",
-          });
+        next(error)
 
     }
 }

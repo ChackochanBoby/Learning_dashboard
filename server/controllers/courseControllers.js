@@ -28,11 +28,7 @@ const createCourse = async (req, res, next) => {
     });
 
   } catch (error) {
-    console.error("ERROR!:" + error);
-    res.status(error.statusCode || 500).json({
-      success: false,
-      message: error.message || "internal server error",
-    });
+    next(error)
   }
 };
 
@@ -43,10 +39,7 @@ const getAllCourses = async (req, res, next) => {
       .status(200)
       .json({ success: true, message: "successfully fetched courses",data:allCourses });
   } catch (error) {
-    res.status(error.statusCode || 500).json({
-      success: false,
-      message: error.message || "internal server error",
-    });
+    next(error)
   }
 };
 
@@ -62,10 +55,7 @@ const getMyCourses = async (req, res, next) => {
     res.status(200).json({success:true,message:"fetched courses by the instructor",data:myCourses})
 
   } catch (error) {
-    res.status(error.statusCode || 500).json({
-      success: false,
-      message: error.message || "internal server error",
-    });
+   next(error)
   }
 }
 
@@ -75,10 +65,7 @@ const getCourseById = async (req, res, next) => {
     const courses = await Course.findById( courseId )
     res.status(200).json({success:true,message:"fetched course by id", data:courses})
   } catch (error) {
-    res.status(error.statusCode || 500).json({
-      success: false,
-      message: error.message || "internal server error",
-    });
+    next(error)
   }
 }
 
@@ -95,10 +82,7 @@ const deleteCourse = async (req, res, next) => {
     res.status(204).send()
 
   } catch (error) {
-    res.status(error.statusCode || 500).json({
-      success: false,
-      message: error.message || "internal server error",
-    });
+    next(error)
   }
 }
 

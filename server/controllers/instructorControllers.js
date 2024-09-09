@@ -20,10 +20,7 @@ const getManagedCourses = async (req, res, next) => {
       })
       res.status(200).json({success:true,message:"fetched managed courses",data:managedCourses})
   } catch (error) {
-    res.status(error.statusCode || 500).json({
-        success: false,
-        message: error.message || "internal server error",
-      });
+    next(error)
   }
 };
 

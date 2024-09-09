@@ -16,8 +16,7 @@ const userAuth = async (req, res, next) => {
     next()
 
   } catch (error) {
-    console.error("ERROR!:" + error)
-    return res.status(error.statusCode||500).json({success:false,message:error.message||"internal server error"})
+    next(error)
   }
   
 };
@@ -33,8 +32,7 @@ const instructorAuth = async (req, res, next) => {
       next()
 
     } catch (error) {
-      console.error("ERROR!:" + error)
-      return res.status(error.statusCode||500).json({success:false,message:error.message||"internal server error"})
+      next(error)
     }
 }
 
@@ -49,8 +47,7 @@ const adminAuth = async (req, res, next) => {
       next()
 
     } catch (error) {
-      console.error("ERROR!:" + error)
-      return res.status(error.statusCode||500).json({success:false,message:error.message||"internal server error"})
+      next(error)
     }
 }
 const learnerAuth = async (req, res, next) => {
@@ -63,8 +60,7 @@ const learnerAuth = async (req, res, next) => {
       next()
 
     } catch (error) {
-      console.error("ERROR!:" + error)
-      return res.status(error.statusCode||500).json({success:false,message:error.message||"internal server error"})
+      next(error)
     }
 }
 
@@ -84,8 +80,7 @@ const instructorAndAdminAuth = async (req, res, next) => {
       next()
 
     } catch (error) {
-      console.error("ERROR!:" + error)
-      return res.status(error.statusCode||500).json({success:false,message:error.message||"internal server error"})
+      next(error)
     }
 }
 const userAndAdminAuth = async (req, res, next) => {
@@ -101,9 +96,21 @@ const userAndAdminAuth = async (req, res, next) => {
       next()
 
     } catch (error) {
-      console.error("ERROR!:" + error)
-      return res.status(error.statusCode||500).json({success:false,message:error.message||"internal server error"})
+      next(error)
     }
+}
+
+const specificUserAuth = async (req, res, next) => {
+  try {
+    const { userId } = req.params
+    const { id } = req.user
+    if (userId !== id) {
+      return res.status(401).json({success:false,message:"unauthorized access"})
+    }
+    next()
+  } catch (error) {
+    next(error)
+  }
 }
 
 
@@ -113,5 +120,6 @@ module.exports = {
   adminAuth,
   learnerAuth,
   instructorAndAdminAuth,
-  userAndAdminAuth
+  userAndAdminAuth,
+  specificUserAuth
 };

@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
 const { User } = require("../models/userModel");
-const { generateToken } = require("../utils/token")
+const { generateToken } = require("../utils/token");
+const { handleImageUpload } = require('../utils/imageUpload');
 
 const userSignup = async (req, res, next) => {
   try {
@@ -28,8 +29,7 @@ const userSignup = async (req, res, next) => {
     res.status(201).json({success:true,message:"signup successfull"})
 
   } catch (error) {
-    console.error("ERROR!:" + error)
-    res.status(error.statusCode||500).json({success:false,message:error.message||"internal server error"})
+    next(error)
   }
 };
 
@@ -56,8 +56,7 @@ const userLogin = async (req, res, next) => {
     res.status(200).json({success:true,message:"user logged in"})
 
   } catch (error) {
-    console.error("ERROR!:" + error)
-    res.status(error.statusCode||500).json({success:false,message:error.message||"internal server error"})
+    next(error)
   }
 }
 
@@ -67,8 +66,7 @@ const userLogout = async (req, res) => {
     res.status(200).json({success:true,message:"successfully logged out "})
 
   } catch (error) {
-    console.error("ERROR!:" + error)
-    res.status(error.statusCode||500).json({success:false,message:error.message||"internal server error"})
+    next(error)
   }
 }
 
@@ -80,14 +78,39 @@ const userProfile = async (req, res, next) => {
     res.status(200).json({success:true,message:"fetched user profile",data:profile})
     
   } catch (error) {
-    console.error("ERROR!:" + error)
-    return res.status(error.statusCode||500).json({success:false,message:error.message||"internal server error"})
+    next(error)
   }
 }
 
-const updateUser = (req, res, next) => {
-  const { id } = req.user
-  
+const updateUser =async (req, res, next) => {
+  try {
+    const { userId } = req.params
+    const {path} = req.file
+    let { name, email } = req.body
+    
+    const user = await User.findById(userId).exec()
+
+    let imgUrl = await handleImageUpload(path)
+
+    if (!name) {
+      name=user.name
+    }
+    
+    if (email && email !== user.email) {
+      const emailInUse = await User.findOne({ email }).exec();
+      if (emailInUse) {
+        return res.status(401).json({ success: false, message: "Email already in use" });
+      }
+    } else {
+      email = user.email;
+    }
+
+    const updatedUser=await User.findByIdAndUpdate(userId,{name:name,email:email,profile_img:imgUrl},{new:true})   
+    res.status(200).json({success:true,message:"user updated"})
+
+  } catch (error) {
+    next(error)
+  }
 }
 
 const getAllUsers = async (req, res, next) => {
@@ -100,8 +123,7 @@ const getAllUsers = async (req, res, next) => {
     res.status(200).json({ success: true, message: "fetched all usets", data:data })
     
   } catch (error) {
-    console.error("ERROR!:" + error)
-    return res.status(error.statusCode||500).json({success:false,message:error.message||"internal server error"})
+    next(error)
   }
 }
 
@@ -109,6 +131,16 @@ const deleteUser = async (req, res, next) => {
   try {
     
     const { userId } = req.params
+
+    const userToDelete = await User.findById(userId);
+    if (!userToDelete) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    // Check if the user being deleted is an admin
+    if (userToDelete.role.includes("admin")) {
+      return res.status(403).json({ success: false, message: "Admins cannot delete other admins" });
+    }
     
     const deletedUser = await User.findByIdAndDelete(userId)
 
@@ -118,13 +150,10 @@ const deleteUser = async (req, res, next) => {
     res.status(204).send()
 
   } catch (error) {
-    res.status(error.statusCode || 500).json({
-      success: false,
-      message: error.message || "internal server error",
-    });
+    next(error)
   }
 }
 
 
 
-module.exports={ userSignup, userLogin, userLogout, userProfile, getAllUsers,deleteUser }
+module.exports={ userSignup, userLogin, userLogout, userProfile, getAllUsers,deleteUser,updateUser }

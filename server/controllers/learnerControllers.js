@@ -10,10 +10,7 @@ const getEnrolledCourses = async (req, res, next) => {
     })
     res.status(200).json({success:true,message:"fetched enrolled courses",data:courseDetails})
   } catch (error) {
-    res.status(error.statusCode || 500).json({
-        success: false,
-        message: error.message || "internal server error",
-      });
+    next(error)
   }
 };
 
@@ -34,10 +31,7 @@ const enroll = async (req, res, next) => {
     await newEnrollment.save()
     res.status(201).json({success:true,message:"user enrolled"})
   } catch (error) {
-    res.status(error.statusCode || 500).json({
-        success: false,
-        message: error.message || "internal server error",
-      });
+    next(error)
   }
 };
 

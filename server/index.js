@@ -5,12 +5,19 @@ const cors = require("cors");
 const { apiRouter } = require("./routes/index");
 const { connectDB } = require("./config/db");
 const cookieParser = require("cookie-parser");
+const { handleError } = require("./utils/error");
 
 app.use(cors({ origin: true, credentials: true }));
 app.use(cookieParser())
 app.use(express.json())
 
 app.use("/api", apiRouter);
+
+app.use(handleError)
+
+app.use("*", (req, res) => {
+  res.status(404).json({message:"End point does not exist"})
+})
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
