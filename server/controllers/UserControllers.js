@@ -83,34 +83,50 @@ const userProfile = async (req, res, next) => {
 }
 
 const updateUser =async (req, res, next) => {
-  try {
-    const { userId } = req.params
-    const {path} = req.file
-    let { name, email } = req.body
-    
-    const user = await User.findById(userId).exec()
+  const { userId } = req.params;
+const { path } = req.file;
+let { name, email } = req.body;
 
-    let imgUrl = await handleImageUpload(path)
+try {
+  const user = await User.findById(userId).exec();
 
-    if (!name) {
-      name=user.name
-    }
-    
-    if (email && email !== user.email) {
-      const emailInUse = await User.findOne({ email }).exec();
-      if (emailInUse) {
-        return res.status(401).json({ success: false, message: "Email already in use" });
-      }
-    } else {
-      email = user.email;
-    }
-
-    const updatedUser=await User.findByIdAndUpdate(userId,{name:name,email:email,profile_img:imgUrl},{new:true})   
-    res.status(200).json({success:true,message:"user updated"})
-
-  } catch (error) {
-    next(error)
+  // If no name, email, or image path is provided, return without updating
+  if (!path && !name && !email) {
+    return res.status(400).json({ success: false, message: "No valid fields to update" });
   }
+
+  let imgUrl;
+  if (path) {
+    imgUrl = await handleImageUpload(path);
+  } else {
+    imgUrl = user.profile_img; // Keep the existing image if no new image is provided
+  }
+
+  if (!name) {
+    name = user.name;
+  }
+
+  if (email && email !== user.email) {
+    const emailInUse = await User.findOne({ email }).exec();
+    if (emailInUse) {
+      return res.status(401).json({ success: false, message: "Email already in use" });
+    }
+  } else {
+    email = user.email;
+  }
+
+  const updatedUser = await User.findByIdAndUpdate(
+    userId,
+    { name: name, email: email, profile_img: imgUrl },
+    { new: true }
+  );
+  
+  res.status(200).json({ success: true, message: "User updated", user: updatedUser });
+
+} catch (error) {
+  next(error);
+}
+
 }
 
 const getAllUsers = async (req, res, next) => {
