@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
 const { User } = require("../models/userModel");
 const { generateToken } = require("../utils/token");
+const jwt = require("jsonwebtoken");
 const { handleImageUpload } = require('../utils/imageUpload');
 
 const userSignup = async (req, res, next) => {
@@ -169,7 +170,20 @@ const deleteUser = async (req, res, next) => {
     next(error)
   }
 }
+const checkUser = async (req, res, next) => {
+  try {
+    const { Token } = req.cookies
+    if (!Token) {
+      return res.status(401).json({success:false,message:"unauthorized access"})
+    }
+    const decoded = jwt.verify(Token, process.env.TOKEN_SECRET_KEY);
+    res.status(200).json({success:true,message:"user details fetched",data:decoded})
+  } catch (error) {
+    next(error)
+  }
+  
+};
 
 
 
-module.exports={ userSignup, userLogin, userLogout, userProfile, getAllUsers,deleteUser,updateUser }
+module.exports={ userSignup, userLogin, userLogout, userProfile, getAllUsers,deleteUser,updateUser,checkUser }

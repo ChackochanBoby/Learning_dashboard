@@ -1,5 +1,5 @@
 const express = require("express")
-const { userSignup, userLogin, userLogout, userProfile, getAllUsers,deleteUser, updateUser }=require("../../controllers/userControllers")
+const { userSignup, userLogin, userLogout, userProfile, getAllUsers,deleteUser, updateUser, checkUser }=require("../../controllers/userControllers")
 const { userAuth, adminAuth, userAndAdminAuth, specificUserAuth } = require("../../middlewares/authMiddllewares")
 const {upload}=require("../../middlewares/multer")
 
@@ -22,6 +22,6 @@ router.delete("/delete/:userId",userAuth,userAndAdminAuth,deleteUser)
 //user list
 router.get("/userlist", userAuth, adminAuth, getAllUsers)
 //check user
-router.get("/checkUser",)
+router.get("/checkuser",checkUser)
 
 module.exports={userRouter:router}

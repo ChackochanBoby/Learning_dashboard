@@ -1,15 +1,18 @@
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { switchLoginState } from "../redux/loginSlice";
+
 
 function LoginForm() {
+  const dispatch = useDispatch()
   const navigate=useNavigate()
   const { register, handleSubmit } = useForm();
-
   const onSubmit = (data) => {
     axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/v1/user/login`, data, { withCredentials: true })
       .then(() => {
-        
+        dispatch(switchLoginState())
         navigate("/")
       })
       .catch((error) => {
