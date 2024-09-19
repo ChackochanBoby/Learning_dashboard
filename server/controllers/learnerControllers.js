@@ -4,9 +4,9 @@ const {Enrollment} = require("../models/enrollmentModel")
 const getEnrolledCourses = async (req, res, next) => {
   try {
     const { id } = req.user
-    const enrolledCourses = await Enrollment.find({ learner: id }).populate({ path: "course", select: "_id title instructor", populate: { path: "instructor", select: "name" } })
+    const enrolledCourses = await Enrollment.find({ learner: id }).populate({ path: "course", select: "_id title image instructor", populate: { path: "instructor", select: "name" } })
     const courseDetails = enrolledCourses.map((courses) => {
-      return {title:courses.course.title,instructor:courses.course.instructor.name,id:courses.course._id}
+      return {title:courses.course.title,instructor:courses.course.instructor.name,id:courses.course._id,image:courses.course.image}
     })
     res.status(200).json({success:true,message:"fetched enrolled courses",data:courseDetails})
   } catch (error) {

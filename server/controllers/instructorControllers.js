@@ -11,12 +11,12 @@ const getManagedCourses = async (req, res, next) => {
     const user = await User.findById(id)
       .populate({
         path: "courses_managed",
-        select: "title _id instructor",
+        select: "title _id instructor image",
         populate: { path: "instructor", select: "name" },
       })
           .exec();
       const managedCourses = user.courses_managed.map((course) => {
-          return {title:course.title,instructor:course.instructor.name,id:course._id}
+          return {title:course.title,instructor:course.instructor.name,id:course._id,image:course.image}
       })
       res.status(200).json({success:true,message:"fetched managed courses",data:managedCourses})
   } catch (error) {

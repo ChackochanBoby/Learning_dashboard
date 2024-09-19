@@ -1,24 +1,32 @@
-// src/loaders/homePageLoader.js
 import axios from "axios";
 
 export async function homeLoader() {
-  try {
-    // Fetch data from multiple APIs concurrently
-    const [instructorCourseResponse, enrolledCourseResponse] = await Promise.all([
-      axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/v1/learner/enrolled`, { withCredentials: true }),
-      axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/v1/instructor/managedcourses`, { withCredentials: true })
-    ]);
+  const managedCoursesPromise = axios.get(
+    `${import.meta.env.VITE_API_BASE_URL}/api/v1/instructor/managedcourses`,
+    { withCredentials: true }
+  ).catch(error => ({ data: { data: [] }, error }));
 
-    // Extract data from responses
+  const enrolledCoursesPromise = axios.get(
+    `${import.meta.env.VITE_API_BASE_URL}/api/v1/learner/enrolled`,
+    { withCredentials: true }
+  ).catch(error => ({ data: { data: [] }, error }));
+
+  try {
+    const [instructorCourseResponse, enrolledCourseResponse] = await Promise.all([managedCoursesPromise, enrolledCoursesPromise]);
+
+    if (instructorCourseResponse.error || enrolledCourseResponse.error) {
+      console.error("Error fetching data:", instructorCourseResponse.error || enrolledCourseResponse.error);
+    }
+
     const managedCourseData = instructorCourseResponse.data.data;
     const enrolledCoursesData = enrolledCourseResponse.data.data;
-    console.log( ...managedCourseData,"this is managed courses")
-    console.log( ...enrolledCoursesData,"this is enrolled courses")
-    // Combine the data into a single object
-    return (
-      {managedCourses:managedCourseData,enrolledCourses:enrolledCoursesData})
+
+    // console.log(...managedCourseData, "this is managed courses");
+    // console.log(...enrolledCoursesData, "this is enrolled courses");
+
+    return { managedCourses: managedCourseData, enrolledCourses: enrolledCoursesData };
   } catch (error) {
-    console.error("Error fetching data:", error);
+    console.error("Error handling promises:", error);
     throw new Response("Data could not be loaded", { status: 500 });
   }
 }

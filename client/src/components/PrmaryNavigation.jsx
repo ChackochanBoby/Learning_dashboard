@@ -7,7 +7,7 @@ function PrmaryNavigation() {
   const [isOpened, toggle] = useState(false);
 
   return (
-    <nav className="p-4 flex flex-row justify-between items-center flex-wrap text-light-navbar-text dark:text-dark-navbar-text">
+    <nav className="mx-auto xl:container p-4 flex flex-row justify-between items-center flex-wrap text-light-navbar-text dark:text-dark-navbar-text">
       {/* brand */}
       <Link className="block text-4xl">Learning</Link>
 
