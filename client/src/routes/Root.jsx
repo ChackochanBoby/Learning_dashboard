@@ -51,11 +51,11 @@ function Root() {
         </header>
       )}
       <Outlet />
-      {!isAuthPage && (
+      {location.pathname==="/"? (
         <footer className="h-36 bg-white">
           Footer
         </footer>
-      )}
+      ):null}
     </div>
   );
 }

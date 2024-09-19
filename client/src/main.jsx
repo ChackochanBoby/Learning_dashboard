@@ -12,6 +12,8 @@ import LoginPage from './routes/LoginPage';
 import store from './redux/store'
 import { Provider } from 'react-redux'
 import { homeLoader } from './loaders/homeLoader';
+import ProfilePage from './routes/ProfilePage';
+import { profileLoader } from './loaders/profileLoader';
 
 const router = createBrowserRouter([
   {
@@ -27,6 +29,11 @@ const router = createBrowserRouter([
         path: "/",
         element: <HomePage />,
         loader: homeLoader
+      },
+      {
+        path: "/profile",
+        element: <ProfilePage />,
+        loader: profileLoader
       },
     ],
   },
