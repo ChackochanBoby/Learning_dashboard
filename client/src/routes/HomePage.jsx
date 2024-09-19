@@ -4,8 +4,7 @@ import { useLoaderData } from "react-router-dom"
 import CourseCard from "../components/CourseCard"
 
 function HomePage() {
-  const { managedCourses, enrolledCourses } = useLoaderData()
-  console.log(enrolledCourses)
+  const { managedCourses, enrolledCourses, } = useLoaderData()
   const userFromRedux = useSelector(state => state.loginReducer.user)
   const [user,setUser]=useState({})
   useEffect(() => {

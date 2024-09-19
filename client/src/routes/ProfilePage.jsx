@@ -1,4 +1,5 @@
-import { useLoaderData } from "react-router-dom";
+import { useLoaderData, useNavigate } from "react-router-dom";
+import GeneralErrorComponent from "../components/GeneralErrorComponent";
 
 const getRandomColor = () => {
   const colors = ["#FF6347", "#4682B4", "#32CD32", "#FFD700", "#8A2BE2"];
@@ -6,8 +7,23 @@ const getRandomColor = () => {
 };
 
 const ProfilePage = () => {
-  const { profileData } = useLoaderData();
-  const { name, email, roles, profile_img } = profileData;
+  const navigate = useNavigate();
+    const data = useLoaderData();
+    console.log(data)
+
+  if (!data.success) {
+    if (data.errorCode === "UNAUTHORIZED") {
+      return navigate("/login");
+    } else if (data.errorCode === "GENERAL_ERROR") {
+      return (
+        <GeneralErrorComponent
+          message="An error occurred while fetching your profile."
+          onRetry={() => window.location.reload()}/>
+      );
+    }
+  }
+
+  const { name, email, roles, profile_img } = data.profileData;
 
   const initials = name ? name.charAt(0).toUpperCase() : "";
   const hasProfileImage = !!profile_img;

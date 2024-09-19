@@ -2,12 +2,14 @@ import { useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 import MenuIcon from "./MenuIcon";
 import ThemeToggle from "./ThemeToggle";
+import { useSelector } from "react-redux";
 
-function PrmaryNavigation() {
+function PrimaryNavigation() {
   const [isOpened, toggle] = useState(false);
-
+  const { user } = useSelector((state => state.loginReducer))
+  const role = user ? user.role : undefined;
   return (
-    <nav className="mx-auto xl:container p-4 flex flex-row justify-between items-center flex-wrap text-light-navbar-text dark:text-dark-navbar-text">
+    <nav className="mx-auto xl:container px-4 py-6 flex flex-row justify-between items-center flex-wrap text-light-navbar-text dark:text-dark-navbar-text">
       {/* brand */}
       <Link className="block text-4xl">Learning</Link>
 
@@ -38,6 +40,11 @@ function PrmaryNavigation() {
         <li>
           <NavLink to={"/courses"}>Courses</NavLink>
         </li>
+        {
+          Array.isArray(role)&&role.includes("admin")?<li>
+          <NavLink to={"/admin"}>Admin</NavLink>
+        </li>:null
+        }
         <li>
           <NavLink to={"/profile"}>Profile</NavLink>
         </li>
@@ -46,4 +53,4 @@ function PrmaryNavigation() {
   );
 }
 
-export default PrmaryNavigation;
+export default PrimaryNavigation;

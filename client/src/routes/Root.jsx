@@ -1,5 +1,5 @@
 import { useNavigate, Outlet, useLocation } from "react-router-dom";
-import PrimaryNavigation from "../components/PrmaryNavigation";
+import PrimaryNavigation from "../components/PrimaryNavigation";
 import { useEffect } from "react";
 import ThemeToggle from "../components/ThemeToggle";
 import { useDispatch, useSelector } from "react-redux";
