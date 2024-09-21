@@ -14,6 +14,8 @@ import { Provider } from 'react-redux'
 import { homeLoader } from './loaders/homeLoader';
 import ProfilePage from './routes/ProfilePage';
 import { profileLoader } from './loaders/profileLoader';
+import CoursesPage from './routes/CoursesPage';
+import { coursesLoader } from './loaders/coursesLoader';
 
 const router = createBrowserRouter([
   {
@@ -29,6 +31,11 @@ const router = createBrowserRouter([
         path: "/",
         element: <HomePage />,
         loader: homeLoader
+      },
+      {
+        path: "/courses",
+        element: <CoursesPage />,
+        loader: coursesLoader
       },
       {
         path: "/profile",

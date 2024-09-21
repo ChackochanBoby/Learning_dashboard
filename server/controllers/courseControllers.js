@@ -34,10 +34,13 @@ const createCourse = async (req, res, next) => {
 
 const getAllCourses = async (req, res, next) => {
   try {
-    const allCourses = await Course.find({});
+    const courses = await Course.find({}).populate({ path: "instructor", select: "name" });
+    const courseData = courses.map(course => {
+      return {title:course.title,id:course._id,instructor:course.instructor.name,image:course.image}
+    })
     res
       .status(200)
-      .json({ success: true, message: "successfully fetched courses",data:allCourses });
+      .json({ success: true, message: "successfully fetched courses",data:courseData });
   } catch (error) {
     next(error)
   }
