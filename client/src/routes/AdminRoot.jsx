@@ -3,45 +3,49 @@ import PrimaryNavigation from "../components/PrimaryNavigation";
 import { useEffect } from "react";
 import ThemeToggle from "../components/ThemeToggle";
 import { useDispatch, useSelector } from "react-redux";
+import { switchAdminLoginState, setAdmin } from "../redux/adminLoginSlice";
 import axios from "axios";
-import { switchLoginState, setUser } from "../redux/loginSlice";
 
-function Root() {
+function AdminRoot() {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  
-  const loggedIn = useSelector(state => state.loginReducer.loggedIn);
-  const user = useSelector(state => state.loginReducer.user);
+
+  const adminLoggedIn = useSelector((state) => state.adminLoginReducer.adminLoggedIn);
+  const admin = useSelector((state) => state.adminLoginReducer.admin);
 
   useEffect(() => {
-    axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/v1/user/checkuser`, { withCredentials: true })
+    axios
+      .get(`${import.meta.env.VITE_API_BASE_URL}/api/v1/admin/checkadmin`, {
+        withCredentials: true,
+      })
       .then((response) => {
-        const userData = response.data.data;
-        
+        const adminData = response.data.data;
+
         // Dispatch Redux actions to update login and user state
-        if (!loggedIn) {
-          dispatch(switchLoginState());
+        if (!adminLoggedIn) {
+          dispatch(switchAdminLoginState());
         }
-        if (!user) {
-          dispatch(setUser(userData));
+        if (!admin) {
+          dispatch(setAdmin(adminData));
         }
       })
-      .catch(error => {
+      .catch((error) => {
         console.log(error);
         // Redirect if the user is not logged in
-        if (location.pathname !== "/login" && location.pathname !== "/signup") {
-          navigate("/login");
+        if (location.pathname !== "/admin/login" && location.pathname !== "/admin/signup"
+        ) {
+          navigate("/admin/login");
         }
       });
-  }, [dispatch, navigate, location.pathname, loggedIn, user]);
-
+  }, [dispatch, navigate, location.pathname, adminLoggedIn, admin]);
   // Conditional Rendering
-  const isAuthPage = location.pathname === "/login" || location.pathname === "/signup";
+  const isAuthPage =
+    location.pathname === "/admin/login" || location.pathname === "/admin/signup";
 
   return (
-    <div className="bg-light-background dark:bg-dark-background grid min-h-screen grid-rows-[min-content_1fr_min-content]">
-      {isAuthPage ? (
+      <div className="bg-light-background dark:bg-dark-background grid min-h-screen grid-rows-[min-content_1fr_min-content]">
+          {isAuthPage ? (
         <div className="ml-auto mr-4 mt-4">
           <ThemeToggle />
         </div>
@@ -51,7 +55,7 @@ function Root() {
         </header>
       )}
       <Outlet />
-      {location.pathname==="/"? (
+      {location.pathname==="/admin"? (
         <footer className="h-36 bg-white">
           Footer
         </footer>
@@ -60,4 +64,4 @@ function Root() {
   );
 }
 
-export default Root;
+export default AdminRoot;

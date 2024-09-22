@@ -1,5 +1,5 @@
 const express = require("express")
-const { learnerAuth, userAuth } = require("../../middlewares/authMiddllewares")
+const { learnerAuth, userAuth } = require("../../middlewares/userMiddllewares")
 const { getEnrolledCourses, enroll } = require("../../controllers/learnerControllers")
 
 const router = express.Router()

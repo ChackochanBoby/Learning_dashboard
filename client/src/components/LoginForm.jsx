@@ -1,19 +1,24 @@
 import { useForm } from "react-hook-form";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { switchLoginState } from "../redux/loginSlice";
 
 
 function LoginForm() {
+  const location = useLocation()
   const dispatch = useDispatch()
   const navigate=useNavigate()
   const { register, handleSubmit } = useForm();
+
+  const isAdminRoute = location.pathname.startsWith("/admin")
+  const loginEndpoint=isAdminRoute?"admin":"user"
+
   const onSubmit = (data) => {
-    axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/v1/user/login`, data, { withCredentials: true })
+    axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/v1/${loginEndpoint}/login`, data, { withCredentials: true })
       .then(() => {
         dispatch(switchLoginState())
-        navigate("/")
+        navigate(isAdminRoute?"/admin":"/")
       })
       .catch((error) => {
         console.error("ERROR!"+error)

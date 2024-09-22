@@ -16,6 +16,9 @@ import ProfilePage from './routes/ProfilePage';
 import { profileLoader } from './loaders/profileLoader';
 import CoursesPage from './routes/CoursesPage';
 import { coursesLoader } from './loaders/coursesLoader';
+import AdminRoot from './routes/AdminRoot';
+import AdminHome from './routes/AdminHome';
+import AdminLoginPage from './routes/AdminLoginPage';
 
 const router = createBrowserRouter([
   {
@@ -44,6 +47,21 @@ const router = createBrowserRouter([
       },
     ],
   },
+  {
+    path: "/admin",
+    element: <AdminRoot />,
+    errorElement: <ErrorPage />,
+    children: [
+      {
+        path: "/admin/login",
+        element:<AdminLoginPage/>
+      },
+      {
+        path: "/admin",
+        element:<AdminHome/>
+      }
+    ]
+  }
 ]);
 
 

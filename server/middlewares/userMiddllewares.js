@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const { User } = require("../models/userModel");
+const {Course} = require("../models/courseModel")
 
 const userAuth = async (req, res, next) => {
   try {
@@ -36,20 +37,7 @@ const instructorAuth = async (req, res, next) => {
     }
 }
 
-const adminAuth = async (req, res, next) => {
-  try {
-      
-      const { role } = req.user  
-      const isAdmin = role.includes("admin")
-      if (!isAdmin) {
-        return res.status(401).json({success:false,message:"unauthorized access"})
-      }
-      next()
 
-    } catch (error) {
-      next(error)
-    }
-}
 const learnerAuth = async (req, res, next) => {
   try {
       const { role } = req.user  
@@ -64,41 +52,6 @@ const learnerAuth = async (req, res, next) => {
     }
 }
 
-//middleware that checks if the user is either admin or an instructor of that particular course
-const instructorAndAdminAuth = async (req, res, next) => {
-  try {
-    const { courseId } = req.params
-      const { role,id } = req.user  
-      const isAdmin = role.includes("admin")
-    if (!isAdmin) {
-      const user = await User.findById(id)
-      const isInstructor = user.courses_managed.includes(courseId)
-      if (!isInstructor) {
-        return res.status(401).json({ success: false, message: "unauthorized access" })
-      }
-      }
-      next()
-
-    } catch (error) {
-      next(error)
-    }
-}
-const userAndAdminAuth = async (req, res, next) => {
-  try {
-    const {userId}= req.params
-    const { role, id } = req.user
-    if (userId !== id) {
-      const isAdmin = role.includes("admin")
-      if (!isAdmin) {
-       return res.status(401).json({success:false,message:"unauthorized access"})
-      }
-      }
-      next()
-
-    } catch (error) {
-      next(error)
-    }
-}
 
 const specificUserAuth = async (req, res, next) => {
   try {
@@ -113,13 +66,31 @@ const specificUserAuth = async (req, res, next) => {
   }
 }
 
+const specificInstructorCourseAuth = async (req, res, next) => {
+  try {
+    const { courseId } = req.params;  // Assuming courseId is passed in the URL
+    const { role, id } = req.user;  // `id` is the user ID from the token payload
+
+    if (!role.includes("instructor")) {
+      return res.status(401).json({ success: false, message: "Unauthorized access" });
+    }
+
+    // Find the course and check if the instructor ID matches the user ID
+    const course = await Course.findById(courseId);
+    if (!course || course.instructor.toString() !== id) {
+      return res.status(403).json({ success: false, message: "Access denied. You are not the instructor of this course." });
+    }
+
+    next();
+  } catch (error) {
+    next(error);
+  }
+};
 
 module.exports = {
   userAuth,
   instructorAuth,
-  adminAuth,
   learnerAuth,
-  instructorAndAdminAuth,
-  userAndAdminAuth,
+  specificInstructorCourseAuth,
   specificUserAuth
 };
