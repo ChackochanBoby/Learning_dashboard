@@ -9,7 +9,7 @@ function CoursesPage() {
           <section className="p-4 my-12" id="all-courses" >
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
               {
-                  allCourses.map((course)=><CourseCard key={course.id} title={course.title} instructor={course.instructor} imageSrc={course.image}/>)
+                      allCourses.map((course) => <CourseCard key={course.id} id={course.id} title={course.title} instructor={course.instructor} imageSrc={course.image} isPaid={course.isPaid} price={course.price} category={ course.category} />)
               }
           </div>
           </section>

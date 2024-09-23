@@ -1,6 +1,6 @@
 const express = require("express")
 const { learnerAuth, userAuth } = require("../../middlewares/userMiddllewares")
-const { getEnrolledCourses, enroll } = require("../../controllers/learnerControllers")
+const { getEnrolledCourses, enroll, checkEnrollment } = require("../../controllers/learnerControllers")
 
 const router = express.Router()
 
@@ -8,6 +8,9 @@ const router = express.Router()
 router.get("/enrolled", userAuth, learnerAuth, getEnrolledCourses)
 
 //enroll
-router.post("/enroll/:courseId",userAuth,learnerAuth,enroll)
+router.post("/enroll/:courseId", userAuth, learnerAuth, enroll)
+
+//check enrollment
+router.get("/check-enrollment/:courseId",userAuth,learnerAuth,checkEnrollment)
 
 module.exports={learnerRouter:router}

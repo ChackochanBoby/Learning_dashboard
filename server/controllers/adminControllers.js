@@ -172,7 +172,7 @@ const checkAdmin = async (req, res, next) => {
     if (!AdminToken) {
       return res.status(401).json({success:false,message:"unauthorized access"})
     }
-    const decoded = jwt.verify(AdminToken, process.env.TOKEN_SECRET_KEY);
+    const decoded = jwt.verify(AdminToken, process.env.TOKEN_SECRET_KEY_ADMIN);
     res.status(200).json({success:true,message:"admin details fetched",data:decoded})
   } catch (error) {
     next(error)

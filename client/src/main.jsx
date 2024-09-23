@@ -19,6 +19,7 @@ import { coursesLoader } from './loaders/coursesLoader';
 import AdminRoot from './routes/AdminRoot';
 import AdminHome from './routes/AdminHome';
 import AdminLoginPage from './routes/AdminLoginPage';
+import SingleCoursePage from './routes/SingleCoursePage';
 
 const router = createBrowserRouter([
   {
@@ -38,7 +39,11 @@ const router = createBrowserRouter([
       {
         path: "/courses",
         element: <CoursesPage />,
-        loader: coursesLoader
+        loader: coursesLoader,
+      },
+      {
+        path: "/courses/:courseId",
+        element:<SingleCoursePage/>
       },
       {
         path: "/profile",

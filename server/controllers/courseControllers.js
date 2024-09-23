@@ -1,5 +1,6 @@
 const { Course } = require("../models/courseModel");
-const {User} = require("../models/userModel")
+const { User } = require("../models/userModel")
+const {Lesson} = require("../models/lesson")
 
 const createCourse = async (req, res, next) => {
   try {
@@ -36,7 +37,7 @@ const getAllCourses = async (req, res, next) => {
   try {
     const courses = await Course.find({}).populate({ path: "instructor", select: "name" });
     const courseData = courses.map(course => {
-      return {title:course.title,id:course._id,instructor:course.instructor.name,image:course.image}
+      return {title:course.title,id:course._id,instructor:course.instructor.name,image:course.image,isPaid:course.isPaid,price:course.price,category:course.category}
     })
     res
       .status(200)
@@ -65,7 +66,7 @@ const getMyCourses = async (req, res, next) => {
 const getCourseById = async (req, res, next) => {
   try {
     const courseId = req.params.courseId
-    const courses = await Course.findById( courseId )
+    const courses = await Course.findById( courseId ).populate({path:"modules",select:"_id title description lessons",populate:{path:"lessons",select:"_id title"}})
     res.status(200).json({success:true,message:"fetched course by id", data:courses})
   } catch (error) {
     next(error)

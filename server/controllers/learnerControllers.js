@@ -1,5 +1,6 @@
 const { User } = require("../models/userModel");
-const {Enrollment} = require("../models/enrollmentModel")
+const { Enrollment } = require("../models/enrollmentModel")
+const {Course} = require ("../models/courseModel")
 
 const getEnrolledCourses = async (req, res, next) => {
   try {
@@ -18,6 +19,10 @@ const enroll = async (req, res, next) => {
   try {
     const { courseId } = req.params
     const { id } = req.user
+    const course = await Course.findById(courseId).exec()
+    if (id == course.instructor) {
+      return res.status(400).json({success:false,message:"instructor cant enroll in the course"})
+    }
     if (!courseId) {
      return res.status(400).json({success:false,message:"course id missing"})
     }
@@ -35,4 +40,20 @@ const enroll = async (req, res, next) => {
   }
 };
 
-module.exports={ getEnrolledCourses,enroll }
+const checkEnrollment = async (req, res,next) => {
+try {
+  const { id } = req.user
+  const { courseId } = req.params
+  const enrollment = await Enrollment.findOne({ learner: id, course: courseId }).exec()
+  if (enrollment) {
+    return res.json({success:true,isEnrolled:true})
+  }
+  else {
+    return res.json({success:true,isEnrolled:false})
+  }
+} catch (error) {
+  next(error)
+}
+}
+
+module.exports={ getEnrolledCourses,enroll,checkEnrollment }
