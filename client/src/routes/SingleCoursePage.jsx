@@ -57,7 +57,7 @@ function SingleCoursePage() {
         id==course.instructor||isEnrolled?(<section id="lessons" className="p-4">
           <h2 className="text-3xl text-light-primary-text dark:text-dark-primary-text text-center my-4">Modules</h2>
           <div>
-            {course.modules.map(module=>{return <ModuleAccordion key={module._id} module={module}/> })}
+            {course.modules.map(module=>{return <ModuleAccordion key={module._id} module={module} instructorId={course.instructor}/> })}
           </div>
         </section>) : (
           <section id="enroll" className="mt-8 mx-auto max-w-screen-md p-4 border border-light-border dark:border-dark-border rounded-lg text-center">

@@ -28,7 +28,7 @@ function HomePage() {
           <h2 className="text-2xl md:text-3xl  text-light-primary-text dark:text-dark-primary-text my-5">Managed Courses</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
             {
-              managedCourses?(managedCourses.map((course)=><CourseCard title={course.title} imageSrc={course.image} instructor={course.instructor} key={course.id}/>)):<span>there are no managed courses</span>
+              managedCourses?(managedCourses.map((course)=><CourseCard title={course.title} imageSrc={course.image} id={course.id} instructor={course.instructor} key={course.id}/>)):<span>there are no managed courses</span>
             }
           </div>
         </section>
