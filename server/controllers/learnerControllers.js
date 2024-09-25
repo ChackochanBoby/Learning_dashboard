@@ -23,6 +23,9 @@ const enroll = async (req, res, next) => {
     if (id == course.instructor) {
       return res.status(400).json({success:false,message:"instructor cant enroll in the course"})
     }
+    if (course.isPublished) {
+      return res.status(400).json({success:false,message:"cant enroll in an un-published course"})
+    }
     if (!courseId) {
      return res.status(400).json({success:false,message:"course id missing"})
     }

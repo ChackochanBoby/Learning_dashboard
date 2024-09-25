@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const { User } = require("../models/userModel");
-const {Course} = require("../models/courseModel")
+const {Course} = require("../models/courseModel");
+const { CourseModule } = require("../models/moduleModel");
 
 const userAuth = async (req, res, next) => {
   try {
@@ -68,17 +69,21 @@ const specificUserAuth = async (req, res, next) => {
 
 const specificInstructorCourseAuth = async (req, res, next) => {
   try {
-    const { courseId } = req.params;  // Assuming courseId is passed in the URL
-    const { role, id } = req.user;  // `id` is the user ID from the token payload
+    const { courseId, moduleId } = req.params;
+    const { role, id } = req.user;
 
     if (!role.includes("instructor")) {
       return res.status(401).json({ success: false, message: "Unauthorized access" });
     }
 
-    // Find the course and check if the instructor ID matches the user ID
-    const course = await Course.findById(courseId);
-    if (!course || course.instructor.toString() !== id) {
-      return res.status(403).json({ success: false, message: "Access denied. You are not the instructor of this course." });
+    let entity;
+    if (courseId) {
+      entity = await Course.findById(courseId);
+    } else if (moduleId) {
+      entity = await CourseModule.findById(moduleId);
+    }
+    if (!entity || entity.instructor.toString() !== id) {
+      return res.status(403).json({ success: false, message: "Access denied. You are not the instructor of this entity." });
     }
 
     next();
@@ -86,6 +91,7 @@ const specificInstructorCourseAuth = async (req, res, next) => {
     next(error);
   }
 };
+
 
 module.exports = {
   userAuth,

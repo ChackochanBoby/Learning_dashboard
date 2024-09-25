@@ -20,6 +20,7 @@ import AdminRoot from './routes/AdminRoot';
 import AdminHome from './routes/AdminHome';
 import AdminLoginPage from './routes/AdminLoginPage';
 import SingleCoursePage from './routes/SingleCoursePage';
+import LessonPage from './routes/LessonPage';
 
 const router = createBrowserRouter([
   {
@@ -44,6 +45,10 @@ const router = createBrowserRouter([
       {
         path: "/courses/:courseId",
         element:<SingleCoursePage/>
+      },
+      {
+        path: "/:courseId/lesson/:lessonId",
+        element:<LessonPage/>
       },
       {
         path: "/profile",

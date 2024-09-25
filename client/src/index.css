@@ -12,3 +12,6 @@ nav>ul>li>a{
 .active{
   @apply text-light-accent
 }
+iframe{
+  @apply aspect-video w-full
+}

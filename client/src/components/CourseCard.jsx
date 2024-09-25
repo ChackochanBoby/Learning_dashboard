@@ -21,7 +21,7 @@ const CourseCard = ({ id,imageSrc, title, instructor,isPaid, price,category }) =
         <div className="mt-4 flex justify-between items-center">
           {
             isHomePage?<div></div>:(<span className="text-light-accent dark:text-dark-accent font-semibold">
-              {isPaid?`$${price}`:"free"}
+              {isPaid?`₹ ${price}`:"free"}
             </span>)
           }
           <button onClick={()=>clickHandler(id)} className="bg-light-button-background dark:bg-dark-button-background text-light-primary-text dark:text-dark-primary-text py-2 px-4 rounded hover:bg-light-accent dark:hover:bg-dark-accent">

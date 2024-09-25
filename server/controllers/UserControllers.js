@@ -26,7 +26,11 @@ const userSignup = async (req, res, next) => {
     //generate jwt token
     const token = await generateToken(user._id, user.name)
     
-    res.cookie("Token", token)
+    res.cookie("Token", token,{
+      httpOnly: true,
+      secure: true, // Set to true if using HTTPS
+      sameSite: 'None' // Allows cross-site cookie sending
+    })
     res.status(201).json({success:true,message:"signup successfull"})
 
   } catch (error) {
@@ -53,7 +57,11 @@ const userLogin = async (req, res, next) => {
 
     //generate jwt token and set cookies
     const token = await generateToken(userExists._id, userExists.name, userExists.roles)
-    res.cookie("Token", token)
+    res.cookie("Token", token,{
+      httpOnly: true,
+      secure: true, // Set to true if using HTTPS
+      sameSite: 'None' // Allows cross-site cookie sending
+    })
     res.status(200).json({success:true,message:"user logged in"})
 
   } catch (error) {

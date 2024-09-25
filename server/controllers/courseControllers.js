@@ -35,7 +35,7 @@ const createCourse = async (req, res, next) => {
 
 const getAllCourses = async (req, res, next) => {
   try {
-    const courses = await Course.find({}).populate({ path: "instructor", select: "name" });
+    const courses = await Course.find({isPublished:true}).populate({ path: "instructor", select: "name" });
     const courseData = courses.map(course => {
       return {title:course.title,id:course._id,instructor:course.instructor.name,image:course.image,isPaid:course.isPaid,price:course.price,category:course.category}
     })
@@ -90,4 +90,40 @@ const deleteCourse = async (req, res, next) => {
   }
 }
 
-module.exports = { createCourse, getAllCourses, getMyCourses, getCourseById,deleteCourse };
+
+const publishCourse = async (req, res, next) => {
+  try {
+    const { courseId } = req.params;
+    
+    // Find the course by its ID and populate its modules
+    const course = await Course.findById(courseId).populate('modules');
+    
+    if (!course) {
+      return res.status(404).json({ message: "Course not found" });
+    }
+
+    // Check if the course has at least one module
+    if (course.modules.length === 0) {
+      return res.status(400).json({ message: "Course must contain at least one module" });
+    }
+
+    // Check if any module contains at least one lesson in its 'lessons' field
+    const hasLessons = course.modules.some(module => module.lessons && module.lessons.length > 0);
+    
+    if (!hasLessons) {
+      return res.status(400).json({ message: "Each module must contain at least one lesson" });
+    }
+
+    course.isPublished = true;
+    await course.save();
+
+    res.status(200).json({ message: "Course published successfully" });
+    
+  } catch (error) {
+    next(error); 
+  }
+};
+
+
+
+module.exports = { createCourse, getAllCourses, getMyCourses, getCourseById,deleteCourse,publishCourse };
