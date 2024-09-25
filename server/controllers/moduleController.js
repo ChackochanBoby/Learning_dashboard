@@ -35,21 +35,30 @@ const createModule = async (req, res, next) => {
 const editModule = async (req, res, next) => {
   try {
     const { moduleId } = req.params;
-    let { title, description } = req.body;
+    const { title, description } = req.body; // Extract title and description from request body
 
     // Find the module to edit
     const moduleToEdit = await CourseModule.findById(moduleId).exec();
 
-    // Fallback to the existing title if not provided
-    if (!title) {
-      title = moduleToEdit.title;
+    // Check if the module exists
+    if (!moduleToEdit) {
+      return res.status(404).json({
+        success: false,
+        message: "Module not found",
+      });
     }
+
+    // Prepare update data
+    const updatedData = {
+      title: title || moduleToEdit.title, // Use existing title if not provided
+      description: description || moduleToEdit.description, // Use existing description if not provided
+    };
 
     // Update the module
     const modifiedModule = await CourseModule.findByIdAndUpdate(
       moduleId,
-      { title, description },
-      { new: true }
+      updatedData,
+      { new: true } // Return the updated document
     ).exec();
 
     // Send success response
@@ -62,6 +71,7 @@ const editModule = async (req, res, next) => {
     next(error);
   }
 };
+
 
 const deleteModule = async (req, res, next) => {
   try {
@@ -96,6 +106,19 @@ const deleteModule = async (req, res, next) => {
   }
 };
 
+const getModuleById = async(req, res, next)=>{
+  const { moduleId } = req.params
+  try {
+    const module = await CourseModule.findById(moduleId).exec()
+    if (!module) {
+      return res.status(400).json({ success: false, message: "couldnt find module" })
+    }
+    res.status(200).json({success:true,message:"fetched moduel",data:module})
+    
+  } catch (error) {
+    next(error)
+  }
+}
 
 
-module.exports = { createModule,editModule,deleteModule };
+module.exports = { createModule,editModule,deleteModule,getModuleById };

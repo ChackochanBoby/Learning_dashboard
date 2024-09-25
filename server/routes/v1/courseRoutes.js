@@ -1,12 +1,12 @@
 const express = require("express")
-const { createCourse, getAllCourses, getMyCourses, getCourseById, deleteCourse, publishCourse  }=require("../../controllers/courseControllers")
+const { createCourse, getAllCourses, getMyCourses, getCourseById, deleteCourse, publishCourse, editCourse  }=require("../../controllers/courseControllers")
 const { userAuth,adminAuth,instructorAuth, specificInstructorCourseAuth, } = require("../../middlewares/userMiddllewares")
 const router = express.Router()
 
 //create a course
 router.post("/addcourse",userAuth,instructorAuth,createCourse)
 //update a course
-router.put("/edit/:courseId",userAuth,specificInstructorCourseAuth)
+router.put("/edit/:courseId",userAuth,specificInstructorCourseAuth,editCourse)
 router.put("/publish/:courseId",userAuth,specificInstructorCourseAuth,publishCourse)
 //delete a course
 router.delete("/delete/:courseId",userAuth,specificInstructorCourseAuth,deleteCourse)

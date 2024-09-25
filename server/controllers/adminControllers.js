@@ -26,7 +26,11 @@ const adminSignup = async (req, res, next) => {
     //generate jwt token
     const token = await generateAdminToken(admin._id, admin.name)
     
-    res.cookie("AdminToken", token)
+    res.cookie("AdminToken", token,{
+      httpOnly: true,
+      secure: true, // Set to true if using HTTPS
+      sameSite: 'None' // Allows cross-site cookie sending
+    })
     res.status(201).json({success:true,message:"signup successfull"})
 
   } catch (error) {
@@ -53,7 +57,11 @@ const adminLogin = async (req, res, next) => {
 
     //generate jwt token and set cookies
     const token = await generateAdminToken(adminExists._id, adminExists.name)
-    res.cookie("AdminToken", token)
+    res.cookie("AdminToken", token,{
+      httpOnly: true,
+      secure: true, // Set to true if using HTTPS
+      sameSite: 'None' // Allows cross-site cookie sending
+    })
     res.status(200).json({success:true,message:"Admin logged in"})
 
   } catch (error) {

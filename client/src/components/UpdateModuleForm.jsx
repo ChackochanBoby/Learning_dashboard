@@ -1,14 +1,23 @@
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useEffect,useState } from "react";
 
-function UpdateModuleForm({ moduleId }) {
+function UpdateModuleForm({ moduleId}) {
   const { register, handleSubmit, formState: { errors } } = useForm();
+  const [module,setModule] = useState(null)
   const navigate = useNavigate();
+
+  useEffect(() => {
+    axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/v1/module/${moduleId}`, { withCredentials: true })
+      .then(response => {
+      setModule(response.data.data)
+    })
+  })
 
   const onSubmit = async (data) => {
     try {
-      await axios.put(`${import.meta.env.VITE_API_BASE_URL}/api/v1/module/${moduleId}`, data, { withCredentials: true });
+      await axios.put(`${import.meta.env.VITE_API_BASE_URL}/api/v1/module/edit/${moduleId}`, data, { withCredentials: true });
       navigate(0);
     } catch (error) {
       console.error("Error adding module:", error);
@@ -23,6 +32,7 @@ function UpdateModuleForm({ moduleId }) {
       <input
         id="title"
         type="text"
+        defaultValue={module?.title}
         {...register("title", { required: "Title is required" })}
         className="w-full border-2 h-10 rounded-lg text-sm px-2"
         placeholder="Enter module title"
@@ -34,6 +44,7 @@ function UpdateModuleForm({ moduleId }) {
       </label>
       <textarea
         id="description"
+        defaultValue={module?.description}
         {...register("description", { required: "Description is required" })}
         className="w-full border-2 rounded-lg text-sm px-2 py-1"
         placeholder="Enter module description"
