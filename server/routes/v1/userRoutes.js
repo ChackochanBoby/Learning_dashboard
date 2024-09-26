@@ -1,5 +1,5 @@
 const express = require("express")
-const { userSignup, userLogin, userLogout, userProfile, getAllUsers,deleteUser, updateUser, checkUser }=require("../../controllers/userControllers")
+const { userSignup, userLogin, userLogout, userProfile, getAllUsers,deleteUser, updateUser, checkUser }=require("../../controllers/UserControllers")
 const { userAuth, adminAuth, userAndAdminAuth, specificUserAuth } = require("../../middlewares/userMiddllewares")
 const {upload}=require("../../middlewares/multer")
 
