@@ -155,7 +155,7 @@ const publishCourse = async (req, res, next) => {
     if (course.modules.length === 0) {
       return res
         .status(400)
-        .json({ message: "Course must contain at least one module" });
+        .json({ message: "nomodule" });
     }
 
     // Check if any module contains at least one lesson in its 'lessons' field
@@ -166,7 +166,7 @@ const publishCourse = async (req, res, next) => {
     if (!hasLessons) {
       return res
         .status(400)
-        .json({ message: "Each module must contain at least one lesson" });
+        .json({ message: "nolesson" });
     }
 
     course.isPublished = true;

@@ -25,7 +25,7 @@ function PublishCourseButton({ courseId, disabled }) {
       setPopupMessage("The course has been published successfully!");
       setActionType("success"); // Set action type for success
     } catch (error) {
-      setPopupMessage("Error publishing the course. Please try again.");
+      setPopupMessage(error.message);
       setActionType("error"); // Set action type for error
       console.log(error);
     } finally {
@@ -49,7 +49,7 @@ function PublishCourseButton({ courseId, disabled }) {
       </button>
 
       {isPopupOpen && (
-        <ConfirmationPopup message={popupMessage} actionType={actionType} />
+        <ConfirmationPopup message={popupMessage} actionType={actionType} onClose={()=>setPopupOpen(false)} />
       )}
     </>
   );

@@ -60,13 +60,9 @@ function SingleCoursePage() {
           setIsAuthorized(false); // Set unauthorized state
           return;
         }
-
-        if (
-          courseData.modules.length > 0 &&
-          courseData.modules.some(
-            (module) => module.lessons && module.lessons.length > 0
-          )
-        ) {
+        const hasLessons = courseData.modules.some(
+          (module) => module.lessons && module.lessons.length > 0)
+        if (courseData.modules.length > 0 && hasLessons) {
           setDisabled(true);
         }
 
