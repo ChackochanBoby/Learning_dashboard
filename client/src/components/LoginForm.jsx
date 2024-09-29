@@ -3,11 +3,13 @@ import axios from "axios";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { switchLoginState } from "../redux/loginSlice";
+import { useState } from "react";
 
 function LoginForm() {
   const location = useLocation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [loginError,setloginError]=useState(null)
   const {
     register,
     handleSubmit,
@@ -26,10 +28,11 @@ function LoginForm() {
       )
       .then(() => {
         dispatch(switchLoginState());
-        navigate(isAdminRoute ? "/admin" : "/");
+        navigate(isAdminRoute ? "/admin" : 0);
       })
       .catch((error) => {
         console.error("ERROR!" + error);
+        setloginError(error.response.data.message)
       });
   };
 
@@ -38,6 +41,9 @@ function LoginForm() {
       onSubmit={handleSubmit(onSubmit)}
       className="flex flex-col gap-4 p-4 max-w-md mx-auto"
     >
+      {
+        loginError&&<span className="text-red-500 text-sm">{loginError}</span>
+      }
       <label htmlFor="email" className="sr-only">
         Email
       </label>

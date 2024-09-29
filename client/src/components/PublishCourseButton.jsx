@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import ConfirmationPopup from "./ConfirmationPopup";
+import { useNavigate } from "react-router-dom";
 
 function PublishCourseButton({ courseId, disabled }) {
+  const navigate=useNavigate()
   const [isPopupOpen, setPopupOpen] = useState(false);
   const [popupMessage, setPopupMessage] = useState("");
   const [actionType, setActionType] = useState("confirm");
@@ -19,7 +21,7 @@ function PublishCourseButton({ courseId, disabled }) {
       await axios.put(
         `${
           import.meta.env.VITE_API_BASE_URL
-        }/api/v1/course/publish/${courseId}`,
+        }/api/v1/course/publish/${courseId}`,{},
         { withCredentials: true }
       );
       setPopupMessage("The course has been published successfully!");
@@ -39,17 +41,17 @@ function PublishCourseButton({ courseId, disabled }) {
       <button
         disabled={isDisabled || isPublishing}
         onClick={handlePublish}
-        className={`block bg-light-accent dark:bg-dark-accent text-dark-primary-text dark:text-white font-semibold px-4 py-2 rounded transition duration-300 ease-in-out ${
-          isDisabled || isPublishing
-            ? "bg-gray-400 cursor-not-allowed"
-            : "hover:bg-green-900"
-        }`}
+        className={`px-4 py-2 font-semibold rounded transition duration-300 ease-in-out ${
+        disabled
+          ? "bg-gray-400 cursor-not-allowed text-gray-600 dark:bg-gray-600 dark:text-gray-400"
+          : "bg-light-accent dark:bg-dark-accent hover:bg-green-900 text-white"
+      }`}
       >
         {isPublishing ? "Publishing..." : "Publish"}
       </button>
 
       {isPopupOpen && (
-        <ConfirmationPopup message={popupMessage} actionType={actionType} onClose={()=>setPopupOpen(false)} />
+        <ConfirmationPopup message={popupMessage} actionType={actionType} onClose={()=>setPopupOpen(false)} onConfirm={()=>navigate(0)} />
       )}
     </>
   );

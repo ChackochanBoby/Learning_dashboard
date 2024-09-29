@@ -60,11 +60,14 @@ function SingleCoursePage() {
           setIsAuthorized(false); // Set unauthorized state
           return;
         }
+        
+        const hasModules = courseData.modules.length > 0;
         const hasLessons = courseData.modules.some(
-          (module) => module.lessons && module.lessons.length > 0)
-        if (courseData.modules.length > 0 && hasLessons) {
-          setDisabled(true);
-        }
+          (module) => module.lessons && module.lessons.length > 0
+        );
+  
+        // Enable the button only if both conditions are met
+        setDisabled(!(hasModules && hasLessons));
 
         // If the user is not the instructor, check if they are enrolled
         if (id !== courseData.instructor) {

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, NavLink,useLocation } from "react-router-dom";
 import MenuIcon from "./MenuIcon";
 import ThemeToggle from "./ThemeToggle";
+import LogoutButton from "./LogoutButton";
 
 function PrimaryNavigation() {
   const [isOpened, toggle] = useState(false);
@@ -53,9 +54,12 @@ function PrimaryNavigation() {
         </li>
         <li>
           <NavLink to={"/profile"}>Profile</NavLink>
-        </li>
+              </li>
           </>
         )}
+        <li>
+                <LogoutButton/>
+              </li>
       </ul>
     </nav>
   );

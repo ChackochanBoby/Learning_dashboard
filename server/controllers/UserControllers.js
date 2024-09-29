@@ -6,37 +6,69 @@ const { handleImageUpload } = require('../utils/imageUpload');
 
 const userSignup = async (req, res, next) => {
   try {
-    const { name, email, password } = req.body;
-    if (!name || !email || !password) {
-      return res.status(400).json({ success: false, message: "all fields required" });
+    const { name, email, password, confirmPassword } = req.body;
+
+    if (!name || !email || !password || !confirmPassword) {
+      return res.status(400).json({ success: false, message: "All fields are required" });
     }
+
+    // Check if name is valid (at least 3 characters)
+    if (name.length < 3) {
+      return res.status(400).json({ success: false, message: "Name should be at least 3 characters long" });
+    }
+
+
+    // Check if email is valid
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ success: false, message: "Invalid email format" });
+    }
+    
+
+    // Check if password is valid (at least 8 characters, at least one letter and one number)
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+={}\[\]|\\:;"'<>,.?/~`-]).{8,}$/;
+    if (!passwordRegex.test(password)) {
+      return res.status(400).json({
+        success: false,
+        message: "Password must be at least 8 characters long and include at least one letter and one number",
+      });
+    }
+    console.log("hi")
+
+    // Check if passwords match
+    if (password !== confirmPassword) {
+      return res.status(400).json({ success: false, message: "Passwords do not match" });
+    }
+
     const userExists = await User.findOne({ email });
     if (userExists) {
-      return res.status(400).json({ success: false, message: "user already exists" });
+      return res.status(400).json({ success: false, message: "User already exists" });
     }
 
     //hash password
     const saltRounds = 10;
-    const hash = await bcrypt.hash(password, saltRounds)
+    const hash = await bcrypt.hash(password, saltRounds);
     
-    //creating and instance of userSchema and saving the document
-    const user = new User({name:name,email:email,password:hash})
-    await user.save()
-
+    //creating an instance of userSchema and saving the document
+    const user = new User({ name, email, password: hash });
+    await user.save();
+    console.log(user)
     //generate jwt token
-    const token = await generateToken(user._id, user.name)
-    
-    res.cookie("Token", token,{
+    const token = await generateToken(user._id, user.name,user.roles);
+
+    res.cookie("Token", token, {
       httpOnly: true,
-      secure: true, // Set to true if using HTTPS
-      sameSite: 'None' // Allows cross-site cookie sending
-    })
-    res.status(201).json({success:true,message:"signup successfull"})
+      secure: true,
+      sameSite: 'None'
+    });
+
+    res.status(201).json({ success: true, message: "Signup successful" });
 
   } catch (error) {
-    next(error)
+    next(error);
   }
 };
+
 
 const userLogin = async (req, res, next) => {
   try {
@@ -69,9 +101,13 @@ const userLogin = async (req, res, next) => {
   }
 }
 
-const userLogout = async (req, res) => {
+const userLogout = async (req, res,next) => {
   try {
-    res.clearCookie("Token")
+    res.clearCookie("Token",{
+      httpOnly: true,  
+      secure: true,
+      sameSite: 'None',
+    })
     res.status(200).json({success:true,message:"successfully logged out "})
 
   } catch (error) {
@@ -84,23 +120,27 @@ const userProfile = async (req, res, next) => {
 
     const { id } = req.user
     const profile = await User.findById(id).exec()
-    res.status(200).json({success:true,message:"fetched user profile",data:profile})
+    const {name,email,roles,profile_img}=profile
+    res.status(200).json({ success: true, message: "fetched user profile", data:{name,email,roles,profile_img}})
     
   } catch (error) {
     next(error)
   }
 }
 
-const updateUser =async (req, res, next) => {
+const updateUser = async (req, res, next) => {
+  
   const { userId } = req.params;
-const { path } = req.file;
-let { name, email } = req.body;
+  let path=null
+  if (req.file) {
+    path=req.file.path
+  }
+let { name } = req.body;
 
 try {
   const user = await User.findById(userId).exec();
 
-  // If no name, email, or image path is provided, return without updating
-  if (!path && !name && !email) {
+  if (!path && !name) {
     return res.status(400).json({ success: false, message: "No valid fields to update" });
   }
 
@@ -108,31 +148,28 @@ try {
   if (path) {
     imgUrl = await handleImageUpload(path);
   } else {
-    imgUrl = user.profile_img; // Keep the existing image if no new image is provided
+    imgUrl = user.profile_img;
   }
 
   if (!name) {
     name = user.name;
   }
 
-  if (email && email !== user.email) {
-    const emailInUse = await User.findOne({ email }).exec();
-    if (emailInUse) {
-      return res.status(401).json({ success: false, message: "Email already in use" });
-    }
-  } else {
-    email = user.email;
-  }
 
   const updatedUser = await User.findByIdAndUpdate(
     userId,
-    { name: name, email: email, profile_img: imgUrl },
+    { name: name, profile_img: imgUrl },
     { new: true }
   );
   
   res.status(200).json({ success: true, message: "User updated", user: updatedUser });
 
 } catch (error) {
+  if (err instanceof multer.MulterError) {
+    if (err.code === 'LIMIT_FILE_SIZE') {
+        return res.status(413).json({ message: 'Profile picture too large. Max size is 5MB.' });
+    }
+}
   next(error);
 }
 

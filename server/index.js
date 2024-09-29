@@ -7,7 +7,9 @@ const { connectDB } = require("./config/db");
 const cookieParser = require("cookie-parser");
 const { handleError } = require("./utils/error");
 
-app.use(cors({ origin: process.env.ORIGIN, credentials: true }));
+const origin=process.env.ORIGIN?process.env.ORIGIN:true
+
+app.use(cors({ origin: origin, credentials: true }));
 app.use(cookieParser())
 app.use(express.json())
 

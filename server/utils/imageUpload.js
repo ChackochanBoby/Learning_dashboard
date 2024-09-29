@@ -1,11 +1,12 @@
-const { cloudinaryInstance } = require("../config/cloudinary")
+const { cloudinaryInstance } = require("../config/cloudinary");
 
 const handleImageUpload = async (path) => {
-    try {
-        const uploadResult = await cloudinaryInstance.uploader.upload(path)
-        return uploadResult.url
-    } catch (error) {
-        next(error)
-    }
-}
-module.exports={handleImageUpload}
+  try {
+    const uploadResult = await cloudinaryInstance.uploader.upload(path);
+    return uploadResult.url;
+  } catch (error) {
+    throw new Error("Image upload failed");
+  }
+};
+
+module.exports = { handleImageUpload };

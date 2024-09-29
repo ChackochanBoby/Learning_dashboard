@@ -1,6 +1,6 @@
 const { Course } = require("../models/courseModel");
 const { User } = require("../models/userModel");
-const { Lesson } = require("../models/lesson");
+const { handleImageUpload } = require('../utils/imageUpload');
 
 const createCourse = async (req, res, next) => {
   try {
@@ -65,29 +65,43 @@ const getAllCourses = async (req, res, next) => {
 };
 
 const editCourse = async (req, res, next) => {
-  const { title, description, category, isPaid, price } = req.body;
+  let { title, description, category, isPaid, price } = req.body;
   const courseId = req.params.courseId; // Extract courseId from the URL params
-
+  let path=null
+  if (req.file) {
+    path=req.file.path
+  }
   try {
-    // Validate required fields
-    if (!title || !description || !category) {
-      return res.status(400).json({
-        success: false,
-        message: "Title, description, and category are required fields.",
-      });
+    const course = await Course.findById(courseId).exec();
+
+    if (!path && !title && !description && !category) {
+      return res.status(400).json({ success: false, message: "No valid fields to update" });
     }
 
-    // Find the course by ID and update it
+    let imgUrl;
+    if (path) {
+      imgUrl = await handleImageUpload(path);
+    } else {
+      imgUrl = course.image;
+    }
+
+    title = title || course.title;
+    description = description || course.description;
+    category = category || course.category;
+
+    price = isPaid ? price.toString() :"0";
+
     const updatedCourse = await Course.findByIdAndUpdate(
       courseId,
       {
         title,
         description,
         category,
-        isPaid, // Include isPaid
-        price: isPaid ? price : 0, // If paid, set the price; otherwise, set it to 0
+        isPaid,
+        price,
+        image: imgUrl,
       },
-      { new: true } // Option to return the updated document
+      { new: true }
     );
 
     if (!updatedCourse) {

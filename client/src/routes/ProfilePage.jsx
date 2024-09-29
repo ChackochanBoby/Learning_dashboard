@@ -1,5 +1,8 @@
 import { useLoaderData, useNavigate } from "react-router-dom";
 import GeneralErrorComponent from "../components/GeneralErrorComponent";
+import EditUserForm from "../components/EditUserForm";
+import Modal from "../components/Modal";
+import { useState } from "react";
 
 const getRandomColor = () => {
   const colors = ["#FF6347", "#4682B4", "#32CD32", "#FFD700", "#8A2BE2"];
@@ -8,8 +11,15 @@ const getRandomColor = () => {
 
 const ProfilePage = () => {
   const navigate = useNavigate();
-    const data = useLoaderData();
-    console.log(data)
+  const data = useLoaderData();
+  const [isModalOpen, setModalOpen] = useState(false)
+  
+  const handleEditButtonClick = () => {
+    setModalOpen(true)
+  }
+  const closeModal = () => {
+    setModalOpen(false)
+  }
 
   if (!data.success) {
     if (data.errorCode === "UNAUTHORIZED") {
@@ -66,11 +76,14 @@ const ProfilePage = () => {
 
         {/* Edit Button */}
         <div className="p-6 border-t-2 border-light-border dark:border-dark-border">
-          <button className="w-full bg-light-accent dark:bg-dark-accent text-white py-2 px-4 rounded hover:bg-light-accent-dark dark:hover:bg-dark-accent-dark">
+          <button onClick={handleEditButtonClick} className="w-full bg-light-accent dark:bg-dark-accent text-white py-2 px-4 rounded hover:bg-light-accent-dark dark:hover:bg-dark-accent-dark">
             Edit Profile
           </button>
         </div>
       </div>
+      <Modal isOpen={isModalOpen} onClose={closeModal}>
+        <EditUserForm />
+      </Modal>
     </main>
   );
 };

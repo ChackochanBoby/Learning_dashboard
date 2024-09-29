@@ -21,6 +21,7 @@ import AdminHome from './routes/AdminHome';
 import AdminLoginPage from './routes/AdminLoginPage';
 import SingleCoursePage from './routes/SingleCoursePage';
 import LessonPage from './routes/LessonPage';
+import SignupPage from './routes/SignupPage';
 
 const router = createBrowserRouter([
   {
@@ -31,6 +32,10 @@ const router = createBrowserRouter([
       {
         path: "/login",
         element:<LoginPage/>
+    },
+      {
+        path: "/signup",
+        element:<SignupPage/>
     },
       {
         path: "/",

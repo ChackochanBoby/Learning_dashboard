@@ -59,8 +59,9 @@ const adminLogin = async (req, res, next) => {
     const token = await generateAdminToken(adminExists._id, adminExists.name)
     res.cookie("AdminToken", token,{
       httpOnly: true,
-      secure: true, // Set to true if using HTTPS
-      sameSite: 'None' // Allows cross-site cookie sending
+      secure: true,
+      sameSite: 'None',
+      path:"/admin"
     })
     res.status(200).json({success:true,message:"Admin logged in"})
 
@@ -71,7 +72,12 @@ const adminLogin = async (req, res, next) => {
 
 const adminLogout = async (req, res) => {
   try {
-    res.clearCookie("AdminToken")
+    res.clearCookie("AdminToken",{
+      httpOnly: true,  
+      secure: true,
+      sameSite: 'None',
+      path:"/admin"
+    })
     res.status(200).json({success:true,message:"successfully logged out "})
 
   } catch (error) {

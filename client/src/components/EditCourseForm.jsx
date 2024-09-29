@@ -4,50 +4,70 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 
 function EditCourseForm({ courseId }) {
-  const { register, handleSubmit, formState: { errors }, setValue } = useForm();
+  const { register, handleSubmit, formState: { errors }, reset } = useForm();
   const navigate = useNavigate();
   const [isPaid, setIsPaid] = useState(false);
+  const [defaultCourseValues, setDefaultCourseValues] = useState();
+  const [selectedFile, setSelectedFile] = useState(null); // State to hold the selected file
 
   useEffect(() => {
-    // Fetch the existing course data to pre-fill the form
     const fetchCourseData = async () => {
       try {
         const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/v1/course/${courseId}`, { withCredentials: true });
         const courseData = response.data.data;
+        setDefaultCourseValues(courseData);
 
-        // Set form values based on fetched data
-        setValue("title", courseData.title);
-        setValue("description", courseData.description);
-        setValue("category", courseData.category);
+        reset({
+          title: courseData.title || "",
+          description: courseData.description || "",
+          category: courseData.category || "",
+          price: courseData.price || "",
+        });
+
         setIsPaid(courseData.isPaid);
-        setValue("price", courseData.price || ""); // Set price if it exists
       } catch (error) {
         console.error(error);
       }
     };
 
     fetchCourseData();
-  }, [courseId, setValue]);
+  }, [courseId, reset]);
 
   const onSubmit = async (data) => {
     try {
-      // Include isPaid in the data object
-      data.isPaid = isPaid; // Ensure isPaid is included in the submitted data
+      data.isPaid = isPaid;
+      data.price = isPaid ? data.price : 0;
+
+      // Create a FormData instance to include the image
+      const requestData = new FormData();
+      requestData.append("title", data.title);
+      requestData.append("description", data.description);
+      requestData.append("category", data.category);
+      requestData.append("isPaid", data.isPaid);
+      requestData.append("price", data.price);
       
-      await axios.put(`${import.meta.env.VITE_API_BASE_URL}/api/v1/course/edit/${courseId}`, data, { withCredentials: true });
-      navigate(0);
+      if (selectedFile) {
+        requestData.append("image", selectedFile); // Append the selected file
+      }
+
+      await axios.put(`${import.meta.env.VITE_API_BASE_URL}/api/v1/course/edit/${courseId}`, requestData, {
+        headers: { "Content-Type": "multipart/form-data" },
+        withCredentials: true,
+      });
+      navigate(0); // Refresh or redirect as needed
     } catch (error) {
       console.error(error);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+    <form onSubmit={handleSubmit(onSubmit)} encType="multipart/form-data" className="flex flex-col gap-4">
       <label htmlFor="title" className="text-sm font-medium">
         Course Title
       </label>
       <input
         id="title"
+        defaultValue={defaultCourseValues?.title}
         type="text"
         {...register("title", { required: "Title is required" })}
         className="w-full border-2 h-10 rounded-lg text-sm px-2"
@@ -60,6 +80,7 @@ function EditCourseForm({ courseId }) {
       </label>
       <textarea
         id="description"
+        defaultValue={defaultCourseValues?.description}
         {...register("description", { required: "Description is required" })}
         className="w-full border-2 rounded-lg text-sm px-2 py-1"
         placeholder="Enter course description"
@@ -71,6 +92,7 @@ function EditCourseForm({ courseId }) {
       </label>
       <input
         id="category"
+        defaultValue={defaultCourseValues?.category}
         type="text"
         {...register("category", { required: "Category is required" })}
         className="w-full border-2 h-10 rounded-lg text-sm px-2"
@@ -88,7 +110,7 @@ function EditCourseForm({ courseId }) {
             checked={!isPaid}
             onChange={() => {
               setIsPaid(false);
-              setValue("price", ""); // Clear price field when free is selected
+              reset({ price: "" }); // Clear price field when free is selected
             }}
           />
           <label htmlFor="free" className="ml-2">Free</label>
@@ -101,7 +123,7 @@ function EditCourseForm({ courseId }) {
             checked={isPaid}
             onChange={() => {
               setIsPaid(true);
-              setValue("price", ""); // Reset price when switching options
+              reset({ price: "" }); // Reset price when switching options
             }}
           />
           <label htmlFor="paid" className="ml-2">Paid</label>
@@ -115,6 +137,7 @@ function EditCourseForm({ courseId }) {
           </label>
           <input
             id="price"
+            defaultValue={Number(defaultCourseValues?.price)}
             type="number"
             {...register("price", { required: isPaid ? "Price is required" : false })}
             className="w-full border-2 h-10 rounded-lg text-sm px-2"
@@ -123,6 +146,17 @@ function EditCourseForm({ courseId }) {
           {errors.price && <p className="text-red-500 text-sm">{errors.price.message}</p>}
         </>
       )}
+
+      <label htmlFor="image" className="text-sm font-medium">
+        Thumbnail Image (Optional)
+      </label>
+      <input
+        id="image"
+        type="file"
+        accept="image/*"
+        onChange={(e) => setSelectedFile(e.target.files[0])} // Handle file selection
+        className="border-2 rounded-lg text-sm px-2"
+      />
 
       <button
         type="submit"
