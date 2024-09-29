@@ -3,7 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 
-function EditCourseForm({ courseId }) {
+function EditCourseForm({ courseId,closeModal }) {
   const { register, handleSubmit, formState: { errors }, reset } = useForm();
   const navigate = useNavigate();
   const [isPaid, setIsPaid] = useState(false);
@@ -54,7 +54,7 @@ function EditCourseForm({ courseId }) {
         headers: { "Content-Type": "multipart/form-data" },
         withCredentials: true,
       });
-      navigate(`/courses/${courseId}`);
+      closeModal()
     } catch (error) {
       console.error(error);
     }

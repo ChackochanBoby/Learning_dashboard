@@ -130,7 +130,7 @@ function SingleCoursePage() {
             isOpen={isEditCourseModalOpen}
             onClose={handleEditCourseModalClose}
           >
-            <EditCourseForm courseId={courseId} />
+            <EditCourseForm courseId={courseId} closeModal={handleEditCourseModalClose}/>
           </Modal>
         </div>
       )}
