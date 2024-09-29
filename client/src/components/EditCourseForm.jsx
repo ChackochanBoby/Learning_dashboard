@@ -47,14 +47,14 @@ function EditCourseForm({ courseId }) {
       requestData.append("price", data.price);
       
       if (selectedFile) {
-        requestData.append("image", selectedFile); // Append the selected file
+        requestData.append("image", selectedFile);
       }
 
       await axios.put(`${import.meta.env.VITE_API_BASE_URL}/api/v1/course/edit/${courseId}`, requestData, {
         headers: { "Content-Type": "multipart/form-data" },
         withCredentials: true,
       });
-      navigate(0); // Refresh or redirect as needed
+      navigate(`/courses/${courseId}`);
     } catch (error) {
       console.error(error);
     }
