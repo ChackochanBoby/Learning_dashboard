@@ -7,30 +7,26 @@ import Modal from "../components/Modal";
 import AddModuleForm from "../components/AddModuleForm";
 import PublishCourseButton from "../components/PublishCourseButton";
 import EditCourseForm from "../components/EditCourseForm";
+import {loadStripe} from "@stripe/stripe-js"
 
 function SingleCoursePage() {
-  const { courseId } = useParams(); // Correctly get courseId from useParams
-  const [course, setCourse] = useState(null); // Initialize course state
-  const [isEnrolled, setIsEnrolled] = useState(false); // Initialize enrollment state
+  const { courseId } = useParams();
+  const [course, setCourse] = useState(null); 
+  const [isEnrolled, setIsEnrolled] = useState(false); 
   const [userLoading, setUserLoading] = useState(true);
-  const user = useSelector((state) => state.loginReducer.user); // Get user ID from Redux store
+  const user = useSelector((state) => state.loginReducer.user); 
   const [isFormModalOpen, setFormModalOpen] = useState(false);
-  const [isEnrollModalOpen, setEnrollModalOpen] = useState(false);
   const [isAuthorized, setIsAuthorized] = useState(true);
   const [isDisabled, setDisabled] = useState(false);
   const [isEditCourseModalOpen, setEditCourseModalOpen] = useState(false);
+  
   const handleAddModuleClick = () => {
     setFormModalOpen(true);
   };
   const handleFormModalClose = () => {
     setFormModalOpen(false);
   };
-  const handleEnrollClick = () => {
-    setEnrollModalOpen(true);
-  };
-  const handleEnrollModalClose = () => {
-    setEnrollModalOpen(false);
-  };
+
   const handleEditCourseClick = () => {
     setEditCourseModalOpen(true);
   };
@@ -88,6 +84,25 @@ function SingleCoursePage() {
     fetchCourse(); // Call the function to fetch data
   }, [courseId, id]); // Dependency array ensures it runs only when courseId or userId changes
 
+
+  const makePayment = async () => {
+    try {
+      const stripe = await loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY)
+
+    const product = {
+      image: course.image,
+      title: course.title,
+      price: course.price,
+      id:course._id
+    }
+    
+    const session = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/v1/payment/create-payment-session`, product, { withCredentials: true })
+      const result = stripe.redirectToCheckout({ sessionId: session.data.sessionId })
+    } catch (error) {
+      console.log(error)
+    }
+}
+
   if (!isAuthorized) {
     return (
       <div className="mx-auto xl:container pt-4 pb-8 w-screen text-center">
@@ -128,7 +143,6 @@ function SingleCoursePage() {
           </button>
           <Modal
             isOpen={isEditCourseModalOpen}
-            onClose={handleEditCourseModalClose}
           >
             <EditCourseForm courseId={courseId} closeModal={handleEditCourseModalClose}/>
           </Modal>
@@ -182,15 +196,11 @@ function SingleCoursePage() {
             You need to enroll in this course to access the course materials.
           </p>
           <button
-            onClick={handleEnrollClick}
+            onClick={makePayment}
             className="block mx-auto bg-light-accent dark:bg-dark-accent text-dark-primary-text font-semibold px-4 my-4 py-2 rounded"
           >
             Enroll Now
           </button>
-          <Modal
-            isOpen={isEnrollModalOpen}
-            onClose={handleEnrollModalClose}
-          ></Modal>
         </section>
       )}
     </main>
