@@ -1,5 +1,6 @@
 const express = require("express")
-const { userAuth } = require("../../middlewares/userMiddllewares")
+const { userAuth } = require("../../middlewares/userMiddllewares");
+const { webhook } = require("../../controllers/paymentControllers");
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 const router = express.Router()
@@ -40,7 +41,7 @@ router.post("/create-payment-session", userAuth, async (req, res, next) => {
     }
 })
 
-router.post("/webhook", )
+router.post("/webhook", webhook)
 
 
 
