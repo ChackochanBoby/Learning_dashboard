@@ -87,7 +87,7 @@ function SingleCoursePage() {
 
   const makePayment = async () => {
     try {
-      const stripe = await loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY)
+      const stripe = await loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE)
 
     const product = {
       image: course.image,
