@@ -2,6 +2,7 @@ const { Enrollment } = require('../models/enrollmentModel');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 const webhook = async (request, response) => {
+  console.log(request.body)
   console.log("Raw Body:", request.body.toString()); // Add this line for debugging
   let event
   const endpointSecret = process.env.STRIPE_ENDPOINT_SECRET_KEY;
