@@ -40,8 +40,6 @@ const createPaymentSession = async (req, res, next) => {
 
 
 const webhook = async (request, response) => {
-  console.log(request.body)
-  console.log("Raw Body:", request.body.toString()); // Add this line for debugging
   let event
   const endpointSecret = process.env.STRIPE_ENDPOINT_SECRET_KEY;
 
@@ -67,7 +65,7 @@ const webhook = async (request, response) => {
   switch (event.type) {
     case 'payment_intent.succeeded':
       const paymentIntent = event.data.object;
-      console.log(`PaymentIntent for ${paymentIntent.amount} was successful!`);
+      console.log(`PaymentIntent for ${paymentIntent} was successful!`);
 
       // Enroll the user
       try {
