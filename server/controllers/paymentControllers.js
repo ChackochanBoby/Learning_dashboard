@@ -30,8 +30,9 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
      await save(newEnrollment)
      console.log(newEnrollment)
      response.send(newEnrollment);
-  }
-   // Return a 200 response to acknowledge receipt of the event
+   }
+   enrollUser()
+   
    
 };
 
