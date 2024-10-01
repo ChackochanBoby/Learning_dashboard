@@ -3,16 +3,17 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 const createPaymentSession = async (req, res, next) => {
   try {
-      const userId=req.user.id
-      const { title,image,price,id } = req.body
+    const { id } =req.user
+    const product = req.body
+    console.log(product)
       const Item = [{
           price_data: {
               currency: "inr",
           product_data: {
-              name: title,
-              images: [image],
+              name: product.title,
+              images: [product.image],
           },
-          unit_amount: Number(price)*100
+          unit_amount: Number(product.price)*100
           },
           quantity:1
 
@@ -25,8 +26,8 @@ const createPaymentSession = async (req, res, next) => {
           success_url:`${process.env.CLIENT_BASE_URL}/payment/success`,
           cancel_url: `${process.env.CLIENT_BASE_URL}/payment/success`,
           metadata: {
-              userId: userId,
-              courseId:id
+              userId: id,
+              courseId:product.id
           }
       }
       )
