@@ -34,6 +34,7 @@ router.post("/create-payment-session", userAuth, async (req, res, next) => {
             }
         }
         )
+        console.log(session)
         res.json({success:true,sessionId:session.id})
         
     } catch (error) {
