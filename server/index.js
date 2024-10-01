@@ -11,7 +11,13 @@ const origin=process.env.ORIGIN?process.env.ORIGIN:true
 
 app.use(cors({ origin: origin, credentials: true }));
 app.use(cookieParser())
-app.use(express.json())
+app.use((req, res, next) => {
+  if (req.originalUrl === '/api/v1/payment/webhook') {
+    next();
+  } else {
+    express.json()(req, res, next);
+  }
+});
 
 app.use("/api", apiRouter);
 
