@@ -42,7 +42,7 @@ router.post("/create-payment-session", userAuth, async (req, res, next) => {
     }
 })
 
-router.post("/webhook", webhook)
+router.post("/webhook", express.raw({ type: 'application/json' }),webhook)
 
 
 
