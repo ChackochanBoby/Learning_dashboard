@@ -41,7 +41,7 @@ const createPaymentSession = async (req, res, next) => {
 
 
 const webhook = async (request, response) => {
-  let event
+  let event;
   const endpointSecret = process.env.STRIPE_ENDPOINT_SECRET_KEY;
 
   // Verify the webhook signature
@@ -64,15 +64,16 @@ const webhook = async (request, response) => {
 
   // Handle the event based on the event type
   switch (event.type) {
-    case 'payment_intent.succeeded':
-      const paymentIntent = event.data.object;
-      console.log(`PaymentIntent for ${paymentIntent} was successful!`);
+    case 'checkout.session.completed':  // Use this event instead of payment_intent.succeeded
+      const session = event.data.object;
+
+      console.log('Checkout Session Completed:', session);
 
       // Enroll the user
       try {
         const newEnrollment = new Enrollment({
-          course: paymentIntent.metadata.courseId,
-          learner: paymentIntent.metadata.userId,
+          course: session.metadata.courseId,
+          learner: session.metadata.userId,
         });
 
         await newEnrollment.save(); // Save the enrollment to the database
@@ -92,4 +93,4 @@ const webhook = async (request, response) => {
   }
 };
 
-module.exports = {createPaymentSession, webhook };
+module.exports = { createPaymentSession, webhook };
