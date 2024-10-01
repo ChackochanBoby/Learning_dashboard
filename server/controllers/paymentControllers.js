@@ -1,3 +1,5 @@
+const { Enrollment } = require('../models/enrollmentModel');
+
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
 
 
@@ -20,9 +22,17 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
      const paymentIntent = event.data.object;
       console.log(`PaymentIntent for ${paymentIntent.amount} was successful!`);
   
-
-  // Return a 200 response to acknowledge receipt of the event
-  response.send();
+   const enrollUser = async () => {
+    const mewEnrollment = new Enrollment({
+      course: paymentIntent.metadata.courseId,
+      user:paymentIntent.metadata.userId
+    })
+     await save(newEnrollment)
+     console.log(newEnrollment)
+     response.send(newEnrollment);
+  }
+   // Return a 200 response to acknowledge receipt of the event
+   
 };
 
 module.exports= {webhook}
