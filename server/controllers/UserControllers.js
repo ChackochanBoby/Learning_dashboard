@@ -120,8 +120,8 @@ const userProfile = async (req, res, next) => {
 
     const { id } = req.user
     const profile = await User.findById(id).exec()
-    const {name,email,roles,profile_img}=profile
-    res.status(200).json({ success: true, message: "fetched user profile", data:{name,email,roles,profile_img}})
+    const {_id,name,email,roles,profile_img}=profile
+    res.status(200).json({ success: true, message: "fetched user profile", data:{id:_id,name,email,roles,profile_img}})
     
   } catch (error) {
     next(error)
@@ -175,19 +175,31 @@ try {
 
 }
 
-const getAllUsers = async (req, res, next) => {
+
+const totalUsers=async (req, res,next) => {
   try {
-    
-    const allUsers = await User.find({}).exec()
-    const data = allUsers.map((user) => {
-      return {name:user.name,email:user.email,id:user._id,roles:user.roles}
-    })
-    res.status(200).json({ success: true, message: "fetched all usets", data:data })
-    
+      const totalUsers = await User.countDocuments();
+      res.status(200).json({ success:true,message:"fetched the number of users",data:totalUsers });
   } catch (error) {
     next(error)
   }
-}
+};
+
+const getUsersByRole = async (req, res) => {
+  try {
+    const { role } = req.query;
+        let filter = {};
+
+        if (role) {
+            filter = { roles: { $in: [role] } };
+        }
+
+        const users = await User.find(filter).sort({ name: 1 });
+        res.status(200).json({ success: true, data: users });
+  } catch (error) {
+    next(error)
+  }
+};
 
 const deleteUser = async (req, res, next) => {
   try {
@@ -229,6 +241,34 @@ const checkUser = async (req, res, next) => {
   
 };
 
+const addInstructorRole = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    if (!user.roles.includes('instructor')) {
+      user.roles.push('instructor');
+      await user.save();
+    }
+    const token = await generateToken(user._id, user.name, user.roles);
+    res.cookie("Token", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'None'
+    });
+    res.status(200).json({ success: true, message: "Instructor role added", roles: user.roles });
+
+  } catch (error) {
+    next(error);
+  }
+};
 
 
-module.exports={ userSignup, userLogin, userLogout, userProfile, getAllUsers,deleteUser,updateUser,checkUser }
+
+
+module.exports={ userSignup, userLogin, userLogout, userProfile, getUsersByRole,deleteUser,updateUser,checkUser,totalUsers,addInstructorRole }

@@ -28,7 +28,7 @@ function LoginForm() {
       )
       .then(() => {
         dispatch(switchLoginState());
-        navigate(isAdminRoute ? "/admin" : 0);
+        navigate(isAdminRoute ? "/admin" : "/");
       })
       .catch((error) => {
         console.error("ERROR!" + error);

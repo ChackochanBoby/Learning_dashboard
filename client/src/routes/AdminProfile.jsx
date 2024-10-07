@@ -3,42 +3,23 @@ import GeneralErrorComponent from "../components/GeneralErrorComponent";
 import EditUserForm from "../components/EditUserForm";
 import Modal from "../components/Modal";
 import { useState } from "react";
-import axios from "axios";
 
 const getRandomColor = () => {
   const colors = ["#FF6347", "#4682B4", "#32CD32", "#FFD700", "#8A2BE2"];
   return colors[Math.floor(Math.random() * colors.length)];
 };
 
-const ProfilePage = () => {
+const AdminProfile = () => {
   const navigate = useNavigate();
   const data = useLoaderData();
-  const [isModalOpen, setModalOpen] = useState(false);
-  const [isInstructor, setIsInstructor] = useState(data.profileData.roles.includes("instructor"));
-  const [isBecomingInstructor, setIsBecomingInstructor] = useState(false); // Button click state
-
+  const [isModalOpen, setModalOpen] = useState(false)
+  
   const handleEditButtonClick = () => {
-    setModalOpen(true);
-  };
-
+    setModalOpen(true)
+  }
   const closeModal = () => {
-    setModalOpen(false);
-  };
-
-  const becomeInstructor = async () => {
-    try {
-      setIsBecomingInstructor(true);
-      const response = await axios.put(`${import.meta.env.VITE_API_BASE_URL}/api/v1/user/update/${data.profileData.id}/addrole`, null, { withCredentials: true });
-      if (response.data.success) {
-        setIsInstructor(true);
-        window.location.reload(); // Refresh to update roles on UI
-      }
-    } catch (error) {
-      console.error("Error becoming instructor:", error);
-    } finally {
-      setIsBecomingInstructor(false);
-    }
-  };
+    setModalOpen(false)
+  }
 
   if (!data.success) {
     if (data.errorCode === "UNAUTHORIZED") {
@@ -47,13 +28,12 @@ const ProfilePage = () => {
       return (
         <GeneralErrorComponent
           message="An error occurred while fetching your profile."
-          onRetry={() => window.location.reload()}
-        />
+          onRetry={() => window.location.reload()}/>
       );
     }
   }
 
-  const { name, email, roles, profile_img } = data.profileData;
+  const { name, email, profile_img } = data.profileData;
 
   const initials = name ? name.charAt(0).toUpperCase() : "";
   const hasProfileImage = !!profile_img;
@@ -86,23 +66,9 @@ const ProfilePage = () => {
           <h1 className="text-light-primary-text dark:text-dark-primary-text text-3xl font-bold text-center">
             {name}
           </h1>
-          <p className="text-light-secondary-text dark:text-dark-secondary-text mt-2 text-center">
-            Roles: {roles.join(", ")}
-          </p>
           <p className="text-light-secondary-text dark:text-dark-secondary-text mt-1 text-center">
             Email: {email}
           </p>
-        </div>
-        <div className="p-6">
-          {!isInstructor && (
-            <button
-              onClick={becomeInstructor}
-              disabled={isBecomingInstructor}
-              className={`w-full ${isBecomingInstructor ? "bg-gray-500" : "bg-light-accent dark:bg-dark-accent"} text-white py-2 px-4 rounded hover:bg-light-accent-dark dark:hover:bg-dark-accent-dark`}
-            >
-              {isBecomingInstructor ? "Processing..." : "Become an Instructor"}
-            </button>
-          )}
         </div>
 
         {/* Edit Button */}
@@ -119,4 +85,4 @@ const ProfilePage = () => {
   );
 };
 
-export default ProfilePage;
+export default AdminProfile;

@@ -9,7 +9,7 @@ const ConfirmationPopup = ({ message, onConfirm, onClose, actionType = "confirm"
           {message}
         </p>
         <div className="flex justify-around">
-          {(actionType==="Euccess"||actionType==="Error")&&<button
+          {(actionType!=="success"||actionType!=="Error")&&<button
             onClick={onClose}
             className="px-4 py-2 bg-gray-300 dark:bg-light-background rounded-md hover:bg-gray-400 dark:hover:bg-gray-600 transition"
           >

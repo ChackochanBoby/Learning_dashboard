@@ -14,7 +14,7 @@ function SignupPage() {
   }, [loggedIn, navigate]);
 
   return (
-    <main className="container px-4 flex justify-center bg-light-background dark:bg-dark-background">
+    <main className="container px-4 flex flex-col justify-center bg-light-background dark:bg-dark-background">
       <section className="w-full max-w-md lg:max-w-96 mx-auto px-4 lg:px-10 text-center flex flex-col gap-4 py-10">
         <h1 className="text-5xl text-center text-light-primary-text dark:text-dark-primary-text mb-4">
           Signup
@@ -23,7 +23,7 @@ function SignupPage() {
           <SignupForm />
         </div>
       </section>
-      <section>
+      <section className="w-full max-w-md lg:max-w-96 mx-auto px-4 lg:px-10 text-center flex flex-col gap-4">
         <div className="mt-4 text-center">
           <p className="text-sm text-light-secondary-text dark:text-dark-secondary-text">
             Already have an account?

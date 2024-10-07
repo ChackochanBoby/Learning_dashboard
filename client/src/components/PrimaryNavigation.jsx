@@ -38,7 +38,7 @@ function PrimaryNavigation() {
         {isAdmin ? (
         <>
         <li>
-          <NavLink to="/admin/dashboard">Dashboard</NavLink>
+          <NavLink to="/admin">Dashboard</NavLink>
         </li>
         <li>
           <NavLink to="/admin/profile">Profile</NavLink>

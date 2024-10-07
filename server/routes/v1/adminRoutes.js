@@ -14,7 +14,7 @@ router.post( "/logout", adminLogout )
 //admin profile
 router.get("/profile",adminAuth, adminProfile)
 //admin update
-router.put("/update/:adminId",adminAuth,specificAdminAuth,upload.single("profile_img"),updateAdmin)
+router.put("/update/:adminId",adminAuth,specificAdminAuth,upload.single("profilePic"),updateAdmin)
 //admin delete
 router.delete("/delete/:adminId",adminAuth,specificAdminAuth,deleteAdmin)
 

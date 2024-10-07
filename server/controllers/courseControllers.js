@@ -64,6 +64,15 @@ const getAllCourses = async (req, res, next) => {
   }
 };
 
+const totalCourses=async (req, res,next) => {
+  try {
+      const totalCourses = await Course.countDocuments();
+      res.status(200).json({ success:true,message:"fetched the number of published courses",data:totalCourses });
+  } catch (error) {
+    next(error)
+  }
+};
+
 const editCourse = async (req, res, next) => {
   let { title, description, category, isPaid, price } = req.body;
   const courseId = req.params.courseId; // Extract courseId from the URL params
@@ -192,6 +201,70 @@ const publishCourse = async (req, res, next) => {
   }
 };
 
+const unpublishCourse = async (req, res, next) => {
+  try {
+    const { courseId } = req.params;
+
+    const course = await Course.findById(courseId);
+
+    if (!course) {
+      return res.status(404).json({ message: "Course not found" });
+    }
+
+    if (!course.isPublished) {
+      return res.status(400).json({ message: "Course is already unpublished" });
+    }
+
+    course.isPublished = false;
+    await course.save();
+
+    res.status(200).json({ message: "Course unpublished successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+const getAllCoursesForAdmin = async (req, res, next) => {
+  try {
+    const { status } = req.query; 
+
+    let filter = {};
+
+    if (status === "published") {
+      filter = { isPublished: true };
+    } else if (status === "unpublished") {
+      filter = { isPublished: false };
+    }
+
+    const courses = await Course.find(filter).populate({
+      path: "instructor",
+      select: "name",
+    });
+
+    const courseData = courses.map((course) => {
+      return {
+        title: course.title,
+        id: course._id,
+        instructor: course.instructor.name,
+        image: course.image,
+        isPaid: course.isPaid,
+        price: course.price,
+        category: course.category,
+        published:course.isPublished
+      };
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Successfully fetched courses",
+      data: courseData,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   createCourse,
   getAllCourses,
@@ -199,4 +272,7 @@ module.exports = {
   getCourseById,
   deleteCourse,
   publishCourse,
+  totalCourses,
+  getAllCoursesForAdmin,
+  unpublishCourse
 };

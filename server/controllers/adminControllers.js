@@ -61,7 +61,6 @@ const adminLogin = async (req, res, next) => {
       httpOnly: true,
       secure: true,
       sameSite: 'None',
-      path:"/admin"
     })
     res.status(200).json({success:true,message:"Admin logged in"})
 
@@ -76,7 +75,6 @@ const adminLogout = async (req, res) => {
       httpOnly: true,  
       secure: true,
       sameSite: 'None',
-      path:"/admin"
     })
     res.status(200).json({success:true,message:"successfully logged out "})
 
@@ -97,16 +95,19 @@ const adminProfile = async (req, res, next) => {
   }
 }
 
-const updateAdmin =async (req, res, next) => {
+const updateAdmin = async (req, res, next) => {
+  
   const { adminId } = req.params;
-const { path } = req.file;
-let { name, email } = req.body;
+  let path=null
+  if (req.file) {
+    path=req.file.path
+  }
+let { name } = req.body;
 
 try {
   const admin = await Admin.findById(adminId).exec();
 
-  // If no name, email, or image path is provided, return without updating
-  if (!path && !name && !email) {
+  if (!path && !name) {
     return res.status(400).json({ success: false, message: "No valid fields to update" });
   }
 
@@ -114,48 +115,31 @@ try {
   if (path) {
     imgUrl = await handleImageUpload(path);
   } else {
-    imgUrl = admin.profile_img; // Keep the existing image if no new image is provided
+    imgUrl = admin.profile_img;
   }
 
   if (!name) {
     name = admin.name;
   }
 
-  if (email && email !== admin.email) {
-    const emailInUse = await Admin.findOne({ email }).exec();
-    if (emailInUse) {
-      return res.status(401).json({ success: false, message: "Email already in use" });
-    }
-  } else {
-    email = admin.email;
-  }
 
   const updatedAdmin = await Admin.findByIdAndUpdate(
     adminId,
-    { name: name, email: email, profile_img: imgUrl },
+    { name: name, profile_img: imgUrl },
     { new: true }
   );
   
-  res.status(200).json({ success: true, message: "Admin updated", user: updatedAdmin });
+  res.status(200).json({ success: true, message: "User updated", user: updatedAdmin });
 
 } catch (error) {
+  if (err instanceof multer.MulterError) {
+    if (err.code === 'LIMIT_FILE_SIZE') {
+        return res.status(413).json({ message: 'Profile picture too large. Max size is 5MB.' });
+    }
+}
   next(error);
 }
 
-}
-
-const getAllUsers = async (req, res, next) => {
-  try {
-    
-    const allUsers = await User.find({}).exec()
-    const data = allUsers.map((user) => {
-      return {name:user.name,email:user.email,id:user._id,roles:user.roles}
-    })
-    res.status(200).json({ success: true, message: "fetched all usets", data:data })
-    
-  } catch (error) {
-    next(error)
-  }
 }
 
 const deleteAdmin = async (req, res, next) => {

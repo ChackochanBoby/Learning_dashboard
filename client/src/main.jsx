@@ -22,6 +22,11 @@ import AdminLoginPage from './routes/AdminLoginPage';
 import SingleCoursePage from './routes/SingleCoursePage';
 import LessonPage from './routes/LessonPage';
 import SignupPage from './routes/SignupPage';
+import UsersPage from './routes/UsersPage';
+import AdminCoursesPage from './routes/AdminCoursesPage';
+import { AdminCoursesLoader } from './loaders/AdminCoursesLoader';
+import { adminProfileLoader } from './loaders/adminProfileLoader';
+import AdminProfile from './routes/AdminProfile';
 
 const router = createBrowserRouter([
   {
@@ -74,6 +79,20 @@ const router = createBrowserRouter([
       {
         path: "/admin",
         element:<AdminHome/>
+      },
+      {
+        path: "/admin/courses",
+        element: <AdminCoursesPage />,
+        loader: AdminCoursesLoader,
+      },
+      {
+        path: "/admin/profile",
+        element: <AdminProfile />,
+        loader: adminProfileLoader,
+      },
+      {
+        path: "/admin/userlist",
+        element:<UsersPage/>
       }
     ]
   }

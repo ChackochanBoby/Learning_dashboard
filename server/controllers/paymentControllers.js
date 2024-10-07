@@ -1,44 +1,42 @@
-const { Enrollment } = require('../models/enrollmentModel');
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const { Enrollment } = require("../models/enrollmentModel");
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 const createPaymentSession = async (req, res, next) => {
   try {
-    const { id } =req.user
-    const product = req.body
-    console.log(product)
-      const Item = [{
-          price_data: {
-              currency: "inr",
+    const { id } = req.user;
+    const product = req.body;
+    console.log(product);
+    const Item = [
+      {
+        price_data: {
+          currency: "inr",
           product_data: {
-              name: product.title,
-              images: [product.image],
+            name: product.title,
+            images: [product.image],
           },
-          unit_amount: Number(product.price)*100
-          },
-          quantity:1
+          unit_amount: Number(product.price) * 100,
+        },
+        quantity: 1,
+      },
+    ];
 
-      }]
-
-      const session = await stripe.checkout.sessions.create({
-          payment_method_types: ["card"],
-          line_items: Item,
-          mode: "payment",
-          success_url:`${process.env.CLIENT_BASE_URL}/payment/success`,
-          cancel_url: `${process.env.CLIENT_BASE_URL}/payment/success`,
-          metadata: {
-              userId: id,
-              courseId:product.id
-          }
-      }
-      )
-      console.log(session)
-      res.json({success:true,sessionId:session.id})
-      
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      line_items: Item,
+      mode: "payment",
+      success_url: `${process.env.CLIENT_BASE_URL}/payment/success`,
+      cancel_url: `${process.env.CLIENT_BASE_URL}/payment/success`,
+      metadata: {
+        userId: id,
+        courseId: product.id,
+      },
+    });
+    console.log(session);
+    res.json({ success: true, sessionId: session.id });
   } catch (error) {
-      next(error)
+    next(error);
   }
-}
-
+};
 
 const webhook = async (request, response) => {
   let event;
@@ -46,7 +44,7 @@ const webhook = async (request, response) => {
 
   // Verify the webhook signature
   if (endpointSecret) {
-    const signature = request.headers['stripe-signature'];
+    const signature = request.headers["stripe-signature"];
     try {
       event = stripe.webhooks.constructEvent(
         request.body,
@@ -59,15 +57,12 @@ const webhook = async (request, response) => {
     }
   }
 
-  // Acknowledge receipt of the event immediately
   response.sendStatus(200);
 
-  // Handle the event based on the event type
-  switch (event.type) {
-    case 'checkout.session.completed':  // Use this event instead of payment_intent.succeeded
-      const session = event.data.object;
 
-      console.log('Checkout Session Completed:', session);
+  switch (event.type) {
+    case "checkout.session.completed":
+      const session = event.data.object;
 
       // Enroll the user
       try {
@@ -77,15 +72,15 @@ const webhook = async (request, response) => {
         });
 
         await newEnrollment.save(); // Save the enrollment to the database
-        console.log('New enrollment created:', newEnrollment);
+        console.log("New enrollment created:", newEnrollment);
       } catch (err) {
-        console.error('Failed to enroll user:', err.message);
+        console.error("Failed to enroll user:", err.message);
       }
       break;
 
     // Handle other event types
-    case 'payment_intent.payment_failed':
-      console.error('Payment failed:', event.data.object);
+    case "payment_intent.payment_failed":
+      console.error("Payment failed:", event.data.object);
       break;
 
     default:

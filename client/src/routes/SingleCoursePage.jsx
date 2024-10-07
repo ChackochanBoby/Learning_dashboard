@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import ModuleAccordion from "../components/ModuleAccordion";
 import Modal from "../components/Modal";
 import AddModuleForm from "../components/AddModuleForm";
@@ -19,6 +19,7 @@ function SingleCoursePage() {
   const [isAuthorized, setIsAuthorized] = useState(true);
   const [isDisabled, setDisabled] = useState(false);
   const [isEditCourseModalOpen, setEditCourseModalOpen] = useState(false);
+  const navigate=useNavigate()
   
   const handleAddModuleClick = () => {
     setFormModalOpen(true);
@@ -84,6 +85,10 @@ function SingleCoursePage() {
     fetchCourse(); // Call the function to fetch data
   }, [courseId, id]); // Dependency array ensures it runs only when courseId or userId changes
 
+  const freeEnrollment = () => {
+    axios.post(`${import.meta.env.VITE_API_BASE_URL}api/v1/learner/enroll/${courseId}`, {}, { withCredentials: true })
+    .then((response)=>{navigate(`/courses/${response.data.data._id}`)})
+  }
 
   const makePayment = async () => {
     try {
@@ -97,7 +102,7 @@ function SingleCoursePage() {
     }
     
     const session = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/v1/payment/create-payment-session`, product, { withCredentials: true })
-      const result = stripe.redirectToCheckout({ sessionId: session.data.sessionId })
+    stripe.redirectToCheckout({ sessionId: session.data.sessionId })
     } catch (error) {
       console.log(error)
     }
@@ -196,7 +201,7 @@ function SingleCoursePage() {
             You need to enroll in this course to access the course materials.
           </p>
           <button
-            onClick={makePayment}
+            onClick={course.isPaid?makePayment:freeEnrollment}
             className="block mx-auto bg-light-accent dark:bg-dark-accent text-dark-primary-text font-semibold px-4 my-4 py-2 rounded"
           >
             Enroll Now

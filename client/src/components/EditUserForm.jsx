@@ -4,17 +4,20 @@ import { useForm } from "react-hook-form"
 import { useSelector } from "react-redux"
 import { useNavigate } from "react-router-dom"
 import ConfirmationPopup from "./ConfirmationPopup"
+import { useLocation } from "react-router-dom"
 
 export default function EditUserForm() {
+  const location=useLocation()
     const navigate = useNavigate()
     const [isSubmitting,setIsSubmitting]=useState(false)
   const [user, setUser] = useState(null)
     const [profilePic, setProfilePic] = useState(null)
-    const userId = useSelector(state => state.loginReducer.user.id)
     const [isPopupOpen, setIsPopupOpen]= useState(false)
     const [popupMessage, setPopupMessage] = useState(null)
     const [popupActionType,setPopupActionType]=useState("success")
 
+  const isAdmin = location.pathname.startsWith("/admin")
+  const userId = useSelector(state => isAdmin?state.adminLoginReducer.admin.id:state.loginReducer.user.id)
     const onPopupConfirm = () => {
         navigate(0)
     }
@@ -22,14 +25,14 @@ export default function EditUserForm() {
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        const userProfile = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/v1/user/profile`, { withCredentials: true })
+        const userProfile = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/v1/${isAdmin?"admin":"user"}/profile`, { withCredentials: true })
         setUser(userProfile.data.data)
       } catch (error) {
         console.log(error)
       }
     }
     fetchUserProfile()
-  }, [])
+  })
 
   const {
     register,
@@ -54,7 +57,7 @@ export default function EditUserForm() {
       }
 
       await axios.put(
-        `${import.meta.env.VITE_API_BASE_URL}/api/v1/user/update/${userId}`,
+        `${import.meta.env.VITE_API_BASE_URL}/api/v1/${isAdmin?"admin":"user"}/update/${userId}`,
         formData,
           { withCredentials: true }
         )
