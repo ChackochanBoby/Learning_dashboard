@@ -72,13 +72,18 @@ const router = createBrowserRouter([
     element: <AdminRoot />,
     errorElement: <ErrorPage />,
     children: [
+    
+      {
+        path: "/admin",
+        element:<AdminHome/>
+      },
       {
         path: "/admin/login",
         element:<AdminLoginPage/>
       },
       {
-        path: "/admin",
-        element:<AdminHome/>
+        path: "/admin/userlist",
+        element:<UsersPage/>
       },
       {
         path: "/admin/courses",
@@ -89,10 +94,6 @@ const router = createBrowserRouter([
         path: "/admin/profile",
         element: <AdminProfile />,
         loader: adminProfileLoader,
-      },
-      {
-        path: "/admin/userlist",
-        element:<UsersPage/>
       }
     ]
   }

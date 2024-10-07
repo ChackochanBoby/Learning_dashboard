@@ -33,8 +33,7 @@ function AdminRoot() {
       .catch((error) => {
         console.log(error);
         // Redirect if the user is not logged in
-        if (location.pathname !== "/admin/login" && location.pathname !== "/admin/signup"
-        ) {
+        if (location.pathname !== "/admin/login") {
           navigate("/admin/login");
         }
       });
